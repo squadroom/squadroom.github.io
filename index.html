@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Squadroom: run a squad of coding agents</title>
-  <meta name="description" content="Squadroom is a browser console for running a squad of coding agents (Claude Code, Codex, Grok Build and more) side by side, each as a sandboxed macOS user in its own Git clone, messaging each other.">
+  <title>Squadroom</title>
+  <meta name="description" content="Squadroom lets you put several coding agents on a job as a team. They message each other on their own, each in a role you pick or write yourself, and they only come to you when they need a decision. It runs on your own Mac.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#11131a" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://squadroom.github.io/">
   <meta property="og:title" content="Squadroom">
-  <meta property="og:description" content="A browser console for a squad of coding agents, each sandboxed in its own macOS user and Git clone.">
+  <meta property="og:description" content="Put several coding agents on a job as a team. They message each other on their own, in roles you pick or write yourself.">
   <meta property="og:url" content="https://squadroom.github.io/">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,17 +23,12 @@
       --paper-2: #ebe4d7;
       --card: #fffdf8;
       --ink: #1b1d26;
-      --ink-2: #4a4d5a;
-      --ink-3: #6e7180;
+      --ink-2: #464956;
+      --muted: #5f6270;
       --line: #d9d0c0;
-      --orange: #e2551c;
+      --orange: #c4470f;
       --orange-soft: #ffe2d3;
-      --teal: #0f8f7c;
       --teal-soft: #d2f1ea;
-      --violet: #6a4fd8;
-      --violet-soft: #e5defd;
-      --gold: #a56a00;
-      --gold-soft: #fbecc8;
       --code-bg: #1b1d26;
       --code-ink: #f4efe6;
       --shadow: 0 1px 0 rgba(27, 29, 38, .06), 0 18px 40px -18px rgba(27, 29, 38, .28);
@@ -48,17 +43,12 @@
         --paper-2: #171a23;
         --card: #1c1f2a;
         --ink: #f1ece2;
-        --ink-2: #c3c0b8;
-        --ink-3: #9a988f;
+        --ink-2: #c8c5bd;
+        --muted: #a3a198;
         --line: #2e3240;
         --orange: #ff8a57;
         --orange-soft: #3a2219;
-        --teal: #4fd6bf;
         --teal-soft: #15332e;
-        --violet: #a996ff;
-        --violet-soft: #272143;
-        --gold: #f2bb4a;
-        --gold-soft: #352a12;
         --code-bg: #0b0c11;
         --code-ink: #f1ece2;
         --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 22px 50px -20px rgba(0, 0, 0, .7);
@@ -67,136 +57,113 @@
 
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
-    body {
-      margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font: 400 17px/1.6 var(--body);
-      overflow-x: hidden;
-    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--body); overflow-x: hidden; }
+    img { max-width: 100%; }
     a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
     a:hover { color: var(--orange); }
     :focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
-    code { font-family: var(--mono); font-size: .88em; background: var(--paper-2); border: 1px solid var(--line); padding: .05em .35em; border-radius: 5px; }
+    code { font-family: var(--mono); font-size: .86em; background: var(--paper-2); border: 1px solid var(--line); padding: .05em .35em; border-radius: 5px; overflow-wrap: anywhere; }
     .wrap { width: min(1140px, 100% - 32px); margin-inline: auto; }
     .skip { position: absolute; left: -9999px; top: 8px; background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; z-index: 10; }
     .skip:focus { left: 16px; }
+    .prose { max-width: 40em; }
+    .prose p { margin: 0 0 16px; color: var(--ink-2); }
+    .prose strong { color: var(--ink); }
 
-    /* ── Header ─────────────────────────────────────────────── */
+    /* Header */
     header.top { padding: 20px 0; }
     header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 21px/1 var(--display); letter-spacing: -.02em; text-decoration: none; }
     .brand svg { width: 30px; height: 30px; flex: none; }
-    nav.links { display: flex; gap: 22px; font-size: 15px; font-weight: 500; }
+    nav.links { display: flex; gap: 20px; font-size: 15px; font-weight: 500; }
     nav.links a { text-decoration: none; color: var(--ink-2); }
     nav.links a:hover { color: var(--orange); }
-    nav.links .gh { color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
-    @media (max-width: 720px) { nav.links a:not(.gh) { display: none; } }
+    @media (max-width: 900px) { nav.links a:not(.gh) { display: none; } }
 
-    /* ── Hero ───────────────────────────────────────────────── */
-    .hero { padding: 40px 0 72px; position: relative; }
-    .hero::before {
-      content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-      background-image: radial-gradient(var(--line) 1px, transparent 1px);
-      background-size: 22px 22px;
-      mask-image: linear-gradient(to bottom, #000 20%, transparent 85%);
-      -webkit-mask-image: linear-gradient(to bottom, #000 20%, transparent 85%);
-    }
-    .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
-    .tag { display: inline-flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none; }
-    .tag li { font: 600 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); }
-    .tag li:first-child { background: var(--orange-soft); color: var(--orange); border-color: transparent; }
-    h1 { font: 800 clamp(40px, 6.2vw, 72px)/1.0 var(--display); letter-spacing: -.035em; margin: 0 0 22px; }
-    h1 em { font-style: normal; color: var(--orange); }
-    .lede { font-size: clamp(17px, 1.6vw, 19.5px); color: var(--ink-2); margin: 0 0 30px; max-width: 34em; }
-    .cta { display: flex; flex-wrap: wrap; gap: 12px; }
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 20px; border-radius: 12px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid var(--ink); transition: transform .15s ease, box-shadow .15s ease; }
+    /* Intro */
+    .hero { padding: 28px 0 64px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; padding: 0; list-style: none; }
+    .tags li { font: 600 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); }
+    h1 { font: 800 clamp(44px, 7vw, 76px)/1 var(--display); letter-spacing: -.035em; margin: 0 0 20px; }
+    .lede { font-size: clamp(17.5px, 1.7vw, 20px); color: var(--ink-2); margin: 0 0 14px; max-width: 36em; }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 44px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid var(--ink); }
     .btn.primary { background: var(--ink); color: var(--paper); box-shadow: 4px 4px 0 var(--orange); }
-    .btn.primary:hover { color: var(--paper); transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--orange); }
-    .btn.ghost { color: var(--ink); }
+    .btn.primary:hover { color: var(--paper); }
     .btn.ghost:hover { color: var(--ink); background: var(--card); }
-    .btn svg { width: 18px; height: 18px; }
 
-    /* ── Screenshots: the hero and the gallery ──────────────── */
-    .shot { margin: 0; }
-    .shot img { display: block; width: 100%; height: auto; border: 1.5px solid var(--ink); border-radius: 14px; background: var(--card); }
-    .shot figcaption { font-size: 14px; color: var(--ink-3); margin-top: 12px; }
-    .console img { border-radius: 18px; box-shadow: var(--shadow), 10px 10px 0 var(--teal-soft); }
-    .console figcaption { text-align: center; margin-top: 16px; }
-    .gallery { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, .42fr); gap: 28px; align-items: start; }
-    .gallery .shot img { box-shadow: var(--shadow); }
-    .gallery strong { color: var(--ink); }
+    /* Screenshots */
+    .shot { margin: 0; min-width: 0; }
+    .shot img { display: block; width: 100%; height: auto; border: 1.5px solid var(--ink); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+    .shot figcaption { font-size: 14.5px; color: var(--muted); margin-top: 10px; }
+    .shot.main img { border-radius: 16px; box-shadow: var(--shadow), 10px 10px 0 var(--teal-soft); }
+    .shot.phone { max-width: 300px; }
 
-    /* ── Sections ───────────────────────────────────────────── */
-    section { padding: 76px 0; }
+    /* Sections */
+    section { padding: 72px 0; }
     section.band { background: var(--paper-2); border-block: 1px solid var(--line); }
-    .kicker { font: 600 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--orange); margin: 0 0 12px; }
-    h2 { font: 800 clamp(30px, 4vw, 46px)/1.06 var(--display); letter-spacing: -.03em; margin: 0 0 16px; max-width: 20em; }
-    .intro { color: var(--ink-2); max-width: 40em; margin: 0 0 40px; font-size: 18px; }
-    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
-    .card h3 { font: 700 19px/1.25 var(--display); letter-spacing: -.01em; margin: 12px 0 8px; }
-    .card p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
-    .icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; }
-    .icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .i-o { background: var(--orange-soft); color: var(--orange); }
-    .i-t { background: var(--teal-soft); color: var(--teal); }
-    .i-v { background: var(--violet-soft); color: var(--violet); }
-    .i-g { background: var(--gold-soft); color: var(--gold); }
+    h2 { font: 800 clamp(28px, 3.6vw, 42px)/1.1 var(--display); letter-spacing: -.025em; margin: 0 0 18px; }
+    h3 { font: 700 19px/1.3 var(--display); margin: 0 0 8px; }
+    .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+    .split.wide-right { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+    .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 40px; align-items: start; margin-top: 40px; }
+    .pair.flip { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
 
-    .agents { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 8px; padding: 0; list-style: none; }
-    .agents li { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 15px; }
-    .agents li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
-    .agents li.next { color: var(--ink-3); font-weight: 500; }
-    .agents li.next::before { background: transparent; border: 1.5px solid var(--ink-3); }
-    .legend { font-size: 14px; color: var(--ink-3); margin: 0; }
+    /* The structure diagram */
+    .tree { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 32px 0 10px; padding: 0; list-style: none; }
+    .proj { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+    .proj > p { margin: 0 0 12px; font-weight: 600; }
+    .proj > p span { display: block; font: 400 13px/1.4 var(--mono); color: var(--muted); }
+    .tabs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .tab { border: 1px dashed var(--muted); border-radius: 10px; padding: 10px 12px; }
+    .tab > p { margin: 0 0 8px; font: 600 12.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--orange); }
+    .agents { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .agents li { font-size: 13.5px; padding: 4px 10px; border-radius: 999px; background: var(--teal-soft); color: var(--ink); }
+    .agents li small { color: var(--ink-2); font-size: 12.5px; }
+    .note { font-size: 14.5px; color: var(--muted); margin: 0; }
 
-    .safety { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
-    .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
-    .checks li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-    .checks li svg { width: 24px; height: 24px; color: var(--teal); stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; }
-    .checks strong { display: block; font-weight: 600; }
-    .checks span { color: var(--ink-2); font-size: 15.5px; }
-    .limits { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 20px 22px; margin-top: 22px; }
-    .limits h3 { font: 700 17px/1.2 var(--display); margin: 0 0 8px; }
-    .limits p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+    /* Lists of facts */
+    .facts { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .facts li { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; color: var(--ink-2); font-size: 16px; }
+    .facts strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+    .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+    .roles li { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 15.5px; color: var(--ink-2); }
+    .roles b { color: var(--ink); font-weight: 600; }
+    .roles .access { font: 400 12.5px/1.4 var(--mono); color: var(--muted); margin-left: 6px; }
+    .roles p { margin: 4px 0 0; }
 
-    .start { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 40px; align-items: start; }
-    .reqs { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-    .reqs li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    /* Setup */
+    .reqs { list-style: none; padding: 0; margin: 0; }
+    .reqs li { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
     .reqs li:last-child { border-bottom: 0; }
-    .reqs b { font: 600 13px/1.5 var(--mono); color: var(--ink); }
+    .reqs b { font: 600 13px/1.6 var(--mono); }
     .reqs span { color: var(--ink-2); font-size: 15.5px; }
-    pre { margin: 0; background: var(--code-bg); color: var(--code-ink); border-radius: var(--radius); padding: 22px; overflow-x: auto; font: 400 13.5px/1.75 var(--mono); border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--orange-soft); }
-    pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; border-radius: 0; }
-    h2 code { font-size: .78em; padding: 0 .25em; border-radius: 8px; }
-    pre .c { color: #8f93a3; }
+    pre { margin: 0; background: var(--code-bg); color: var(--code-ink); border-radius: var(--radius); padding: 20px; overflow-x: auto; font: 400 13.5px/1.75 var(--mono); border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--orange-soft); }
+    pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; overflow-wrap: normal; }
+    pre .c { color: #9a9eae; }
     pre .p { color: #ff9b6e; user-select: none; }
     .after { margin: 18px 0 0; color: var(--ink-2); font-size: 15.5px; }
 
-    footer { padding: 48px 0 56px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); }
+    footer { padding: 44px 0 52px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--muted); }
     footer .wrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; }
     footer p { margin: 0 0 10px; }
     footer ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; }
     footer a { color: var(--ink-2); }
 
-    /* ── Narrow screens ─────────────────────────────────────── */
     @media (max-width: 960px) {
-      .hero .wrap, .safety, .start, footer .wrap { grid-template-columns: minmax(0, 1fr); }
-      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .hero { padding-top: 24px; }
-      .gallery { grid-template-columns: minmax(0, 1fr); }
-      .gallery .phone { max-width: 320px; }
+      .split, .split.wide-right, .pair.flip, footer .wrap { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+      .tree { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 620px) {
       body { font-size: 16px; }
-      section { padding: 56px 0; }
-      .cards { grid-template-columns: minmax(0, 1fr); }
+      section { padding: 52px 0; }
+      .roles, .pair { grid-template-columns: minmax(0, 1fr); }
+      .shot.phone { max-width: 260px; }
       .reqs li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-      .btn { flex: 1 1 auto; justify-content: center; }
+      .btn { flex: 1 1 auto; }
       footer ul { grid-template-columns: minmax(0, 1fr); }
-      .console img { box-shadow: var(--shadow), 6px 6px 0 var(--teal-soft); }
+      .shot.main img { box-shadow: var(--shadow), 6px 6px 0 var(--teal-soft); }
     }
   </style>
 </head>
@@ -210,13 +177,13 @@
         Squadroom
       </a>
       <nav class="links" aria-label="Main">
-        <a href="#features">Features</a>
-        <a href="#safety">Safety</a>
-        <a href="#start">Get started</a>
-        <a class="gh" href="https://github.com/squadroom/squadroom">
-          <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          GitHub
-        </a>
+        <a href="#together">Working together</a>
+        <a href="#roles">Roles</a>
+        <a href="#layout">Projects and tabs</a>
+        <a href="#tools">Agent tools</a>
+        <a href="#spend">Spend limits</a>
+        <a href="#start">Setup</a>
+        <a class="gh" href="https://github.com/squadroom/squadroom">GitHub</a>
       </nav>
     </div>
   </header>
@@ -224,195 +191,370 @@
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="wrap">
-        <div>
-          <ul class="tag" aria-label="Project status">
-            <li>Early</li>
-            <li>macOS</li>
-            <li>MIT licence</li>
-          </ul>
-          <h1 id="hero-title">A room for your squad of <em>coding agents</em>.</h1>
-          <p class="lede">
-            Squadroom is a browser console for running coding agents side by
-            side: Claude Code, Codex, Grok Build and more. Each one works as
-            a sandboxed macOS user in its own Git clone, and they message each
-            other, so your Lead can ask your Reviewer for a review while you
-            watch, from your desk or your phone.
-          </p>
-          <div class="cta">
-            <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">
-              Get started
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-            <a class="btn ghost" href="https://github.com/squadroom/squadroom">View on GitHub</a>
-          </div>
+        <ul class="tags" aria-label="Project status">
+          <li>Early project</li>
+          <li>macOS only</li>
+          <li>MIT licence</li>
+        </ul>
+        <h1 id="hero-title">Squadroom</h1>
+        <p class="lede">
+          Squadroom lets you put several coding agents on a job as a team. They
+          message each other on their own, each in a role you pick from the
+          built-in ones or write yourself as a prompt, and they only come to
+          you when they need a decision.
+        </p>
+        <p class="lede">
+          It's a web page you run on your own Mac. You can have several repos
+          open with a different squad on each piece of work, and you never
+          copy text between terminal windows to keep them talking.
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Read the setup guide</a>
+          <a class="btn ghost" href="https://github.com/squadroom/squadroom">Source on GitHub</a>
         </div>
-
-        <figure class="shot console">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcset="assets/console-desktop-dark.png">
-              <img src="assets/console-desktop-light.png" width="2880" height="1800" fetchpriority="high" decoding="async"
-                   alt="Squadroom with the Weather Station project open: four agent windows side by side, Lead and Backend working, Frontend waiting for the owner and Reviewer idle after posting its review, with the team timeline above them and two items in Needs you.">
-            </picture>
-          <figcaption>A project tab with four agents: a Lead, Backend and Frontend developers, and a Reviewer that only reads. Demo data.</figcaption>
+        <figure class="shot main">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="assets/console-desktop-dark.png">
+            <img src="assets/console-desktop-light.png" width="2880" height="1800" fetchpriority="high" decoding="async"
+                 alt="Squadroom with the Weather Station project open on its Build tab. Four agent windows sit side by side: Lead on Claude Code and Backend on Codex are working, Frontend on Claude Code is waiting for the owner, and Reviewer on Grok Build is idle after posting a review. The sidebar lists three projects and the top bar says two items need you.">
+          </picture>
+          <figcaption>One tab with four agents on three different tools. The data is made up for the screenshot.</figcaption>
         </figure>
       </div>
     </section>
 
-    <section id="screens" class="band" aria-labelledby="screens-title">
+    <section id="together" class="band" aria-labelledby="together-title">
       <div class="wrap">
-        <p class="kicker">See it</p>
-        <h2 id="screens-title">Agents that talk, changes you can check.</h2>
-        <div class="gallery">
+        <h2 id="together-title">How a squad works together</h2>
+        <div class="split">
+          <div class="prose">
+            <p>
+              The agents in a squad have a set of team tools. With them one can
+              send a teammate a message, ask a question and get the answer back,
+              merge in a teammate's work, claim the files it's about to edit, or
+              ask a teammate to hold off for a while. A message waits until the
+              other agent finishes its current turn, then arrives as its next
+              prompt. You don't pass anything along yourself.
+            </p>
+            <p>
+              You can also set up routes, which pass one agent's finished reply
+              straight to another. For example, when the Lead ends with "ready
+              for review", the Reviewer gets it.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              <strong>Where you come in.</strong> With a team, you give the goal
+              to the Orchestrator, and it reports back to you in its window. With
+              a pair, you talk to the Lead. You can still type into any agent's
+              window whenever you want.
+            </p>
+            <p>
+              Anything else that needs you goes into one tray called
+              <strong>Needs you</strong>, which covers every project: an agent
+              asking for network access, a question, a request to push a branch,
+              a note an agent left for you, or a tab that has paused. The
+              <strong>Team</strong> panel shows every message between the agents
+              in a tab if you want to read along. Browser and e-mail
+              notifications are there if you want them.
+            </p>
+          </div>
+        </div>
+        <div class="pair">
           <figure class="shot">
             <picture>
               <source media="(prefers-color-scheme: dark)" srcset="assets/team-messages-dark.png">
               <img src="assets/team-messages-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                   alt="The Team panel above the agent windows: Lead sends Frontend and Backend their parts, Backend reports a commit, Lead asks Reviewer for a review and Reviewer answers.">
+                   alt="The Team panel open above the agent windows. Lead sends Frontend and Backend their parts, Backend reports a commit back to Lead, Lead asks Reviewer for a review and Reviewer answers.">
             </picture>
-            <figcaption><strong>Team messages.</strong> Every message between a tab's agents, asks and their answers in one timeline.</figcaption>
-          </figure>
-          <figure class="shot">
-            <picture>
-              <source media="(prefers-color-scheme: dark)" srcset="assets/changes-pr-dark.png">
-              <img src="assets/changes-pr-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                   alt="Backend's Changes dialog: its branch, pull request #42 opened, an Approve button, the five files changed against main, and one turn's commit expanded to its diff.">
-            </picture>
-            <figcaption><strong>Changes and pull requests.</strong> Each turn is a commit; push the branch and open its pull request when you approve.</figcaption>
+            <figcaption>The Team panel: every message between the agents in this tab, in order.</figcaption>
           </figure>
           <figure class="shot phone">
             <picture>
               <source media="(prefers-color-scheme: dark)" srcset="assets/phone-needs-you-dark.png">
               <img src="assets/phone-needs-you-light.png" width="1170" height="2532" loading="lazy" decoding="async"
-                   alt="The Needs you tray on a phone: Frontend asks for network access to registry.npmjs.org with Allow once and Always buttons, and Docs asks a question with an answer box.">
+                   alt="The Needs you tray on a phone. Frontend asks for network access to registry.npmjs.org, with Deny, Always for this agent, Always for this project and Allow once buttons. Below it, the Docs agent asks a question and there is a box for the answer.">
             </picture>
-            <figcaption><strong>Needs you, on a phone.</strong> Approvals and questions wait in one tray.</figcaption>
+            <figcaption>Needs you on a phone: a network request and a question.</figcaption>
+          </figure>
+        </div>
+
+        <div class="pair flip">
+          <div class="prose">
+            <h3>Checking what they changed</h3>
+            <p>
+              Every agent works in its own Git clone on its own branch. When a
+              turn ends, Squadroom commits what changed, so you can go through
+              the work one turn at a time. Nothing goes to GitHub until you
+              approve it. Then Squadroom pushes the branch and opens a pull
+              request.
+            </p>
+            <h3>Stopping a squad that keeps going</h3>
+            <p>
+              A tab pauses by itself if one message from you has led to 40 agent
+              turns, or has kept the squad busy for two hours, or if two agents
+              have sent each other 12 messages without a new commit. You look at
+              what happened and press Resume if it's fine. You can also pause a
+              tab, a project or everything yourself.
+            </p>
+          </div>
+          <figure class="shot">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/changes-pr-dark.png">
+              <img src="assets/changes-pr-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                   alt="The Changes dialog for the Backend agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one turn's commit opened to show its diff.">
+            </picture>
+            <figcaption>One agent's changes: its branch, its pull request and each turn's commit.</figcaption>
           </figure>
         </div>
       </div>
     </section>
 
-    <section id="features" aria-labelledby="features-title">
-      <div class="wrap">
-        <p class="kicker">What it does</p>
-        <h2 id="features-title">One page for every agent you run.</h2>
-        <p class="intro">
-          Open a project, add tabs, and put named agent windows in each tab.
-          Squadroom runs them on your own Mac, with your own accounts and
-          keys, and keeps a record of everything they did.
-        </p>
-        <div class="cards">
-          <article class="card">
-            <div class="icon i-o"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></div>
-            <h3>Projects, tabs and windows</h3>
-            <p>A GitHub repository, a fresh folder, or no files at all. Each window streams replies, folds thinking, and shows every command as one line you can open.</p>
-          </article>
-          <article class="card">
-            <div class="icon i-t"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M6 8.5v7M8.3 7.2c4 1 7.4 2.4 7.6 4.3"/></svg></div>
-            <h3>One clone per agent, a commit per turn</h3>
-            <p>Every agent works on its own <code>console/</code> branch. Each finished turn is committed, so every step is a checkpoint you can review.</p>
-          </article>
-          <article class="card">
-            <div class="icon i-v"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v9l-3-2h-6"/></svg></div>
-            <h3>Agents that talk to each other</h3>
-            <p>Team tools let agents send, ask and reply, pull a teammate's work, claim files and ask you to push. Messages arrive when the recipient is free.</p>
-          </article>
-          <article class="card">
-            <div class="icon i-g"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></div>
-            <h3>Needs you, in one tray</h3>
-            <p>Network access, an unknown tool, a push, a question from an agent: anything Squadroom does not decide waits for you in one place, on desktop or phone.</p>
-          </article>
-          <article class="card">
-            <div class="icon i-o"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M4.2 16.5l2.6-1.5M17.2 9l2.6-1.5"/><circle cx="12" cy="12" r="4"/></svg></div>
-            <h3>Guard rails</h3>
-            <p>Per-turn time and output limits, per-tab spend limits for API-key models, a circle detector for agents that keep each other busy, and pause for a tab, a project or everything.</p>
-          </article>
-          <article class="card">
-            <div class="icon i-t"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
-            <h3>From any browser</h3>
-            <p>One private https address that only your GitHub account can sign in to, with e-mailed codes. Templates, roles, run reports, search and notifications included.</p>
-          </article>
+    <section id="roles" aria-labelledby="roles-title">
+      <div class="wrap split wide-right">
+        <div class="prose">
+          <h2 id="roles-title">Roles</h2>
+          <p>
+            A role is a prompt with a name. It tells the agent what its job is
+            and how to work with the others. Squadroom comes with eight, and
+            when you add an agent you pick one from the list.
+          </p>
+          <p>
+            To make your own, open <strong>Settings</strong>, then
+            <strong>Roles</strong>, then <strong>New role</strong>. You give it a
+            name, a one-line description, whether it edits or only looks, a
+            suggested tool (Claude Code or Codex) and a prompt of up to 3,500
+            characters. You can also rewrite the prompt of a built-in role, and
+            reset it later.
+          </p>
+          <p>
+            When you add an agent, you can still change its prompt for that one
+            agent without touching the role. A tab you like can be saved as a
+            template, with its agents, roles and message routes, and used again
+            for a new tab.
+          </p>
         </div>
+        <ul class="roles" aria-label="Built-in roles">
+          <li><b>Orchestrator</b><span class="access">looks only</span><p>Splits your goal into parts, hands them out and gets them reviewed. Doesn't write code.</p></li>
+          <li><b>Planner</b><span class="access">looks only</span><p>Turns a goal into a short ordered plan with a check for each part.</p></li>
+          <li><b>Architect</b><span class="access">looks only</span><p>Decides modules and interfaces up front, then checks commits against them.</p></li>
+          <li><b>Lead</b><span class="access">edits</span><p>Writes the code for the area it's given and reports back when it's done.</p></li>
+          <li><b>Pair Lead</b><span class="access">edits</span><p>Works for you directly and has a Reviewer check its changes before it reports.</p></li>
+          <li><b>Designer</b><span class="access">edits</span><p>Layout, styling and accessibility in the components it's given.</p></li>
+          <li><b>Reviewer</b><span class="access">looks only</span><p>Reads teammates' commits and reports problems, most serious first.</p></li>
+          <li><b>Tester</b><span class="access">edits</span><p>Writes and runs tests, and gives the exact command when one fails.</p></li>
+        </ul>
       </div>
     </section>
 
-    <section class="band" aria-labelledby="agents-title">
+    <section id="layout" class="band" aria-labelledby="layout-title">
       <div class="wrap">
-        <p class="kicker">Who's in the squad</p>
-        <h2 id="agents-title">The official clients, with your own accounts.</h2>
-        <p class="intro">Squadroom drives each provider's own command-line client. You bring the subscription or API key and use it under that provider's terms.</p>
-        <ul class="agents" aria-label="Supported agents">
-          <li>Claude Code</li>
-          <li>Codex</li>
-          <li>Grok Build</li>
-          <li class="next">Gemini CLI</li>
-          <li class="next">Kimi Code</li>
-          <li class="next">OpenCode</li>
+        <h2 id="layout-title">Projects, tabs and squads</h2>
+        <div class="split">
+          <div class="prose">
+            <p>
+              <strong>A project</strong> is usually a GitHub repo. It can also
+              be a new local folder, or no files at all if you only want agents
+              to talk something through. You can have several projects going.
+            </p>
+            <p>
+              <strong>A tab</strong> is one piece of work inside a project, such
+              as building a feature, a security review or the docs. Tabs run at
+              the same time, and each has its own agents.
+            </p>
+            <p>
+              <strong>A squad</strong> is the set of agents in a tab. It can be
+              one agent, a pair, or a team with an Orchestrator and up to seven
+              members, and you can add more agents by hand. You can mix tools in
+              the same squad, so a Claude Code agent can write the code while a
+              Codex agent reviews it.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Each agent gets its own name, model and thinking level, and either
+              edits in its own folder or only looks.
+            </p>
+            <p>
+              There are six agent tools to choose from, listed in
+              <a href="#tools">Agent tools</a> below.
+            </p>
+            <p>
+              Up to six agent turns run at once across everything, and three per
+              account or API key. Anything over that waits in a queue.
+            </p>
+          </div>
+        </div>
+
+        <ul class="tree" aria-label="Example: three projects, their tabs and the agents in each tab">
+          <li class="proj">
+            <p>Weather Station <span>a GitHub repo</span></p>
+            <ul class="tabs">
+              <li class="tab"><p>Build</p>
+                <ul class="agents">
+                  <li>Lead <small>Claude Code</small></li>
+                  <li>Backend <small>Codex</small></li>
+                  <li>Frontend <small>Claude Code</small></li>
+                  <li>Reviewer <small>Grok Build</small></li>
+                </ul>
+              </li>
+              <li class="tab"><p>Review</p><ul class="agents"><li>Security <small>Claude Code</small></li></ul></li>
+              <li class="tab"><p>Docs</p><ul class="agents"><li>Docs <small>Codex</small></li></ul></li>
+            </ul>
+          </li>
+          <li class="proj">
+            <p>recipe-app <span>a new local folder</span></p>
+            <ul class="tabs">
+              <li class="tab"><p>Main</p>
+                <ul class="agents">
+                  <li>Full-stack <small>Claude Code</small></li>
+                  <li>Tester <small>Codex</small></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="proj">
+            <p>Naming ideas <span>no files, talk only</span></p>
+            <ul class="tabs">
+              <li class="tab"><p>Main</p><ul class="agents"><li>Ideas <small>Claude Code</small></li></ul></li>
+            </ul>
+          </li>
         </ul>
-        <p class="legend">Filled dot: offered today. Outline: built in, switched on once it has been qualified.</p>
+        <p class="note">These are the same projects as in the screenshot above.</p>
+      </div>
+    </section>
+
+    <section id="tools" aria-labelledby="tools-title">
+      <div class="wrap split">
+        <div class="prose">
+          <h2 id="tools-title">Agent tools</h2>
+          <p>
+            You can pick any of these when you add an agent or set up a team,
+            and mix them in one squad. Each one runs with your own account or
+            API key. Gemini CLI, Kimi Code and OpenCode become selectable once
+            <a href="https://github.com/squadroom/squadroom/pull/9">pull request #9</a>
+            is merged.
+          </p>
+          <p>
+            Some tools can only look for now. An agent that only looks can read
+            the code, run commands you approve and message its teammates, but it
+            can't change files. That makes it a good fit for a Reviewer or a
+            Planner.
+          </p>
+          <p>
+            <strong>Images with Krea.</strong> Claude Code agents that can edit
+            can also make and edit images with Krea, which helps when you're
+            prototyping a design. You switch it on per project. Each image costs
+            between $0.015 and $0.065 and is charged to the tab, and one turn can
+            make at most 8 images and spend at most $1. The images go in the
+            agent's <code>design/</code> folder and are committed with its turn.
+          </p>
+        </div>
+        <ul class="reqs" aria-label="Agent tools">
+          <li><b>Claude Code</b><span>On your Claude plan or an API key. Edits in its own folder or only looks.</span></li>
+          <li><b>Codex</b><span>On your ChatGPT login. Edits or only looks.</span></li>
+          <li><b>Grok Build</b><span>With an xAI API key. Only looks for now.</span></li>
+          <li><b>Gemini CLI</b><span>With a Gemini API key. Only looks for now.</span></li>
+          <li><b>Kimi Code</b><span>On your Kimi Code membership. Only looks for now.</span></li>
+          <li><b>OpenCode</b><span>With an API key for the model you choose: GPT-5.6 Luna, Claude Haiku 4.5, DeepSeek V4 Pro, DeepSeek V4.1 Flash or Kimi K3. Only looks for now.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="spend" class="band" aria-labelledby="spend-title">
+      <div class="wrap split">
+        <div class="prose">
+          <h2 id="spend-title">Spend limits</h2>
+          <p>
+            There are two kinds of limit, and both are for API keys you pay for
+            by use. Agents that run on a subscription, such as a Claude plan or
+            a ChatGPT login, aren't counted.
+          </p>
+          <p>
+            <strong>Each tab has a spend limit.</strong> It's $5 unless you change
+            it, and you can set anything from $0.01 to $1,000 from the tab's
+            menu. Squadroom adds up the cost of each finished turn from the usage
+            the agent reports. When the total reaches the limit, the tab pauses,
+            and nothing in it runs again until you press
+            <strong>Reset spend</strong>. That needs a code from your e-mail, and
+            so does raising the limit. The check runs after each turn, so turns
+            already running can take a tab a little over. If an agent doesn't
+            report its usage properly, the turn is charged as if it used its
+            whole allowance, and the tab pauses.
+          </p>
+          <p>
+            <strong>Each paid key needs a monthly cap at the provider.</strong>
+            You set the cap on the provider's own site first, for example $25 a
+            month on an xAI key, and then enter it when you add the key.
+            Squadroom won't give a key to any agent until a cap is entered. The
+            provider's cap is the real ceiling, because Squadroom's own figures
+            are estimates.
+          </p>
+          <p>
+            There are no separate limits for a whole project or for a single
+            agent. The Overview page shows what each tab and each key has spent
+            this month.
+          </p>
+        </div>
+        <figure class="shot">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="assets/keys-connections-dark.png">
+            <img src="assets/keys-connections-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                 alt="Settings, Keys and connections. Three keys are listed by their last four characters: a Claude Code login, a GitHub token and an xAI API key with a cap of $25 a month. Below them, connection panels show that the installed Claude Code and Codex match the tested versions.">
+          </picture>
+          <figcaption>Keys and connections. The xAI key shows the $25 monthly cap that was set at xAI.</figcaption>
+        </figure>
       </div>
     </section>
 
     <section id="safety" aria-labelledby="safety-title">
-      <div class="wrap safety">
-        <div>
-          <p class="kicker">How it keeps your Mac safe</p>
-          <h2 id="safety-title">Agents never run as you.</h2>
-          <p class="intro">
-            Coding agents run commands. Squadroom assumes any of them could be
-            prompt-injected, and builds the walls accordingly.
+      <div class="wrap split">
+        <div class="prose">
+          <h2 id="safety-title">Safety</h2>
+          <p>
+            Coding agents run commands, and any of them could be tricked by
+            something it reads. Squadroom is set up with that in mind.
           </p>
-          <div class="limits">
-            <h3>Honest limits</h3>
-            <p>
-              All agents share one <code>agent</code> user, so a running agent
-              can read another's environment; treat every key you hand agents
-              as readable by all of them, and cap paid keys at the provider.
-              Squadroom is single-user, not a multi-tenant sandbox. The full
-              threat model is in
-              <a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">docs/architecture.md</a>.
-            </p>
-          </div>
+          <p>
+            <strong>What it doesn't protect against.</strong> All agents run as
+            the same <code>agent</code> user, so a running agent can read another
+            running agent's environment, keys included. Treat every key you give
+            agents as readable by all of them, and cap paid keys at the provider.
+            Network access you approve is really open to that agent. Squadroom is
+            for one person on their own Mac. It isn't a sandbox for other people.
+            The details are in
+            <a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">docs/architecture.md</a>.
+          </p>
         </div>
-        <ul class="checks">
-          <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-            <div><strong>A separate macOS user</strong><span>Every agent runs as a hidden <code>agent</code> user that cannot read your home folder, through one root-owned launcher.</span></div>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-            <div><strong>Sandboxed, in its own clone</strong><span>Claude Code's sandbox, Codex permission profiles and a macOS sandbox profile for the others: writes stay inside the agent's own folder.</span></div>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h3a5 5 0 0 1 0 10h-3M9 17H6A5 5 0 0 1 6 7h3M8 12h8"/></svg>
-            <div><strong>No GitHub credential for agents</strong><span>Pushes go through your own mirror, only to <code>console/</code> branches of protected repositories, after a scan for any credential Squadroom handed out.</span></div>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            <div><strong>You approve what matters</strong><span>Network access, pushes and unknown tools wait in Needs you. Weighty actions, such as changing keys, need a fresh e-mailed code.</span></div>
-          </li>
-          <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"/><path d="M17 15l4 4M21 15l-4 4"/></svg>
-            <div><strong>Secrets redacted, spend capped</strong><span>Credentials are redacted from everything stored, and paid keys are refused unless you have set a monthly cap at the provider.</span></div>
-          </li>
+        <ul class="facts">
+          <li><strong>A separate macOS user</strong>Agents run as a hidden <code>agent</code> user that can't read your home folder.</li>
+          <li><strong>One clone per agent</strong>Each agent can only write inside its own clone. Claude Code runs in its own sandbox, Codex under permission profiles, and the other tools inside a macOS sandbox profile.</li>
+          <li><strong>You approve network access</strong>An agent that wants to reach a site, say the npm registry, asks first. You can allow it once, always for that agent, or always for the project.</li>
+          <li><strong>No GitHub access for agents</strong>Agents never get a GitHub token. Squadroom pushes for them, only to <code>console/</code> branches in repos whose base branch is protected, and first checks that the push holds none of the keys it gave out.</li>
+          <li><strong>Sign-in</strong>Only your GitHub account can sign in, with a code sent to your e-mail. Changing keys or raising a limit asks for a fresh code.</li>
         </ul>
       </div>
     </section>
 
     <section id="start" class="band" aria-labelledby="start-title">
-      <div class="wrap start">
+      <div class="wrap split">
         <div>
-          <p class="kicker">Get started</p>
-          <h2 id="start-title">An afternoon, and <code>sudo</code> once.</h2>
+          <h2 id="start-title">What you need</h2>
+          <p class="after" style="margin: 0 0 12px">
+            Squadroom isn't packaged yet. Expect to spend an afternoon setting it
+            up the first time.
+          </p>
           <ul class="reqs" aria-label="Requirements">
-            <li><b>macOS</b><span>Apple silicon or Intel, with 40 GB free.</span></li>
+            <li><b>A Mac</b><span>Apple silicon or Intel, with 40 GB of free disk. Linux and Windows aren't supported.</span></li>
             <li><b>Node.js 24</b><span>From Homebrew or the official installer.</span></li>
-            <li><b>sudo, once</b><span>To create the <code>agent</code> user, install the pinned clients and the launcher.</span></li>
-            <li><b>https</b><span>A TLS proxy on the Mac, such as Tailscale Serve.</span></li>
-            <li><b>Accounts</b><span>A GitHub OAuth app of your own, a Resend account for e-mailed codes, and the agent providers you want.</span></li>
+            <li><b>sudo, once</b><span>The setup script creates the <code>agent</code> user and installs the agent tools and a small launcher.</span></li>
+            <li><b>An https address</b><span>Tailscale Serve is the easiest way. It also lets you open Squadroom on your phone.</span></li>
+            <li><b>Your own accounts</b><span>A GitHub OAuth app for sign-in, a Resend account for the e-mailed codes, and accounts or keys for the agent tools you want to use.</span></li>
           </ul>
         </div>
         <div>
-          <pre aria-label="Quick start commands"><code><span class="p">$ </span>git clone https://github.com/squadroom/squadroom.git
+          <h3>How to start</h3>
+          <pre aria-label="Commands to install and start Squadroom"><code><span class="p">$ </span>git clone https://github.com/squadroom/squadroom.git
 <span class="p">$ </span>cd squadroom &amp;&amp; npm ci
 <span class="p">$ </span>cp .env.example .env.local   <span class="c"># sign-in and mail settings</span>
 <span class="p">$ </span>sudo zsh scripts/console/setup-agent-user.sh
@@ -421,11 +563,9 @@
 <span class="p">$ </span>npm run console:worker       <span class="c"># in a second terminal</span></code></pre>
           <p class="after">
             Then open <code>https://&lt;your address&gt;/console</code>, sign in
-            with GitHub and add your keys. The
+            with GitHub and add your keys under Settings. The
             <a href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">setup guide</a>
-            walks through every step, and the
-            <a href="https://github.com/squadroom/squadroom#readme">README</a>
-            has the overview.
+            goes through each step.
           </p>
         </div>
       </div>
@@ -438,16 +578,18 @@
         <p><strong>Squadroom</strong> is open source under the
           <a href="https://github.com/squadroom/squadroom/blob/main/LICENSE">MIT licence</a>.</p>
         <p>
-          Squadroom is an independent project and is not affiliated with,
-          endorsed by or sponsored by Anthropic, OpenAI or Google, or any other
-          provider. Product names are their owners' trademarks.
+          It's an independent project, not affiliated with or endorsed by
+          Anthropic, OpenAI, Google, xAI, Moonshot AI, DeepSeek, Krea or any
+          other provider. You use each agent
+          tool with your own account and under that provider's terms. Product
+          names belong to their owners.
         </p>
       </div>
       <ul>
         <li><a href="https://github.com/squadroom/squadroom">Source on GitHub</a></li>
         <li><a href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Setup guide</a></li>
-        <li><a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">Architecture</a></li>
-        <li><a href="https://github.com/squadroom/squadroom/blob/main/SECURITY.md">Report a vulnerability</a></li>
+        <li><a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">How it works</a></li>
+        <li><a href="https://github.com/squadroom/squadroom/blob/main/SECURITY.md">Report a security problem</a></li>
         <li><a href="https://github.com/squadroom/squadroom/blob/main/CONTRIBUTING.md">Contributing</a></li>
         <li><a href="https://github.com/squadroom/squadroom/issues">Issues</a></li>
       </ul>
