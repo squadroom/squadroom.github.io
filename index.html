@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Squadroom</title>
-  <meta name="description" content="Squadroom lets you put several coding agents on a job as a team. They message each other on their own, each in a role you pick or write yourself, and they only come to you when they need a decision. It runs on your own Mac.">
+  <meta name="description" content="Squadroom runs squads of coding agents from different vendors that message each other on their own, in built-in or custom roles, and bring in the human only when a decision is needed. Runs locally; MIT licensed.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#11131a" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://squadroom.github.io/">
   <meta property="og:title" content="Squadroom">
-  <meta property="og:description" content="Put several coding agents on a job as a team. They message each other on their own, in roles you pick or write yourself.">
+  <meta property="og:description" content="Squads of coding agents from different vendors that message each other on their own and bring in the human only when a decision is needed.">
   <meta property="og:url" content="https://squadroom.github.io/">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,8 +83,6 @@
 
     /* Intro */
     .hero { padding: 28px 0 64px; }
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; padding: 0; list-style: none; }
-    .tags li { font: 600 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); }
     h1 { font: 800 clamp(44px, 7vw, 76px)/1 var(--display); letter-spacing: -.035em; margin: 0 0 20px; }
     .lede { font-size: clamp(17.5px, 1.7vw, 20px); color: var(--ink-2); margin: 0 0 14px; max-width: 36em; }
     .cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 44px; }
@@ -177,11 +175,11 @@
         Squadroom
       </a>
       <nav class="links" aria-label="Main">
-        <a href="#together">Working together</a>
+        <a href="#together">Messaging</a>
         <a href="#roles">Roles</a>
         <a href="#layout">Projects and tabs</a>
         <a href="#tools">Agents</a>
-        <a href="#spend">Spend limits</a>
+        <a href="#spend">Spend</a>
         <a href="#start">Setup</a>
         <a class="gh" href="https://github.com/squadroom/squadroom">GitHub</a>
       </nav>
@@ -191,79 +189,67 @@
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="wrap">
-        <ul class="tags" aria-label="Project status">
-          <li>Early project</li>
-          <li>macOS only</li>
-          <li>Free, MIT licence</li>
-        </ul>
         <h1 id="hero-title">Squadroom</h1>
         <p class="lede">
-          Squadroom lets you put several coding agents on a job as a team. They
-          message each other on their own, each in a role you pick from the
-          built-in ones or write yourself as a prompt, and they only come to
-          you when they need a decision.
+          Squadroom runs squads of coding agents from different vendors that
+          message each other on their own, each in a built-in or custom role (a
+          role is a named prompt). They bring in the human through one place,
+          and only when a decision is needed.
         </p>
         <p class="lede">
-          It's a web page you run on your own Mac. You can have several repos
-          open, each with its own tabs for different pieces of work, and a
-          group of agents (a squad) in each tab. You never copy text between
-          terminal windows to keep them talking.
+          It holds several projects at once, each with several tabs, and every
+          tab has its own squad and its own spend limit. A squad can be a pair,
+          a full team under an Orchestrator, or any shape in between.
         </p>
         <p class="lede">
-          It's free and open source. You need a Mac, your own Claude, ChatGPT
-          or API accounts for the agents, and an afternoon to set it up.
+          It runs locally as a web app behind an https address, so it works
+          from a laptop or a phone. It is free and open source.
         </p>
         <div class="cta">
-          <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Read the setup guide</a>
+          <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Setup guide</a>
           <a class="btn ghost" href="https://github.com/squadroom/squadroom">Source on GitHub</a>
         </div>
         <figure class="shot main">
           <picture>
             <source media="(prefers-color-scheme: dark)" srcset="assets/console-desktop-dark.png">
             <img src="assets/console-desktop-light.png" width="2880" height="1800" fetchpriority="high" decoding="async"
-                 alt="Squadroom with the Weather Station project open on its Build tab. Four agent windows sit side by side: Lead on Claude Code and Backend on Codex are working, Frontend on Claude Code is waiting for the owner, and Reviewer on Grok Build is idle after posting a review. The sidebar lists three projects and the top bar says two items need you.">
+                 alt="The Weather Station project open on its Build tab, with four agent windows side by side. Lead on Claude Code and Backend on Codex are working, Frontend on Claude Code is waiting for the owner, and Reviewer on Grok Build is idle after posting a review. The sidebar lists three projects; the top bar shows two items in Needs you.">
           </picture>
-          <figcaption>One tab with four agents, using Claude Code, Codex and Grok Build. The data is made up for the screenshot.</figcaption>
+          <figcaption>One tab with four agents on Claude Code, Codex and Grok Build. Sample data.</figcaption>
         </figure>
       </div>
     </section>
 
     <section id="together" class="band" aria-labelledby="together-title">
       <div class="wrap">
-        <h2 id="together-title">How a squad works together</h2>
+        <h2 id="together-title">Messaging between agents</h2>
         <div class="split">
           <div class="prose">
             <p>
-              The agents in a squad have a set of team tools. With them an agent
-              can send another agent a message, ask a question and get the
-              answer back, merge in another agent's work, claim the files it's
-              about to edit, or ask another agent to wait before touching
-              something. A message waits until the other agent has finished its
-              current reply (Squadroom calls one reply from an agent a turn),
-              then arrives as its next prompt. You don't pass anything along
-              yourself.
+              Every agent in a squad has a set of team tools. It can message
+              another agent, ask a question and get the answer back, merge
+              another agent's work, claim files before editing them, and ask
+              another agent to wait. A message arrives as the recipient's next
+              prompt when its current turn (one reply from an agent) ends.
             </p>
             <p>
-              You can also have one agent's reply sent straight to another. For
-              example, when the Lead ends its reply with "ready for review", the
-              Reviewer gets it.
+              Hand-offs send one agent's reply straight to another. When the
+              Lead ends a turn with "ready for review", the Reviewer gets it as
+              its next prompt.
             </p>
           </div>
           <div class="prose">
             <p>
-              With a full team, you give the goal to the agent in charge (the
-              Orchestrator), and it reports back to you in its window. With a
-              pair, you talk to the Pair Lead. You can still type into any
-              agent's window whenever you want.
+              The goal goes to the Orchestrator in a team, or to the Pair Lead
+              in a pair. Any agent's window also takes typed input at any time.
             </p>
             <p>
-              Anything else that needs you goes into one tray called
-              <strong>Needs you</strong>, which covers every project. That's
-              where you'll find a Claude Code or Codex agent asking to reach a
-              site, a question, a request to push a branch, a note an agent left
-              for you, or a tab that has paused. The <strong>Team</strong> panel
-              shows every message between the agents in a tab if you want to
-              read along. You can also turn on browser and e-mail notifications.
+              Everything else that needs a human lands in one
+              <strong>Needs you</strong> tray across all projects: network
+              requests (Claude Code and Codex ask per site), questions, push
+              approvals, notes from agents and paused tabs. The
+              <strong>Team</strong> panel shows every agent-to-agent message in
+              a tab. Browser and e-mail notifications are optional.
             </p>
           </div>
         </div>
@@ -272,15 +258,15 @@
             <picture>
               <source media="(prefers-color-scheme: dark)" srcset="assets/team-messages-dark.png">
               <img src="assets/team-messages-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                   alt="The Team panel open above the agent windows. Lead sends Frontend and Backend their parts, Backend reports a commit back to Lead, Lead asks Reviewer for a review and Reviewer answers.">
+                   alt="The Team panel above the agent windows. Lead sends Frontend and Backend their parts, Backend reports a commit to Lead, Lead asks Reviewer for a review and Reviewer answers.">
             </picture>
-            <figcaption>The Team panel, with every message between the agents in this tab in order.</figcaption>
+            <figcaption>The Team panel lists every message between the agents in a tab, in order.</figcaption>
           </figure>
           <figure class="shot phone">
             <picture>
               <source media="(prefers-color-scheme: dark)" srcset="assets/phone-needs-you-dark.png">
               <img src="assets/phone-needs-you-light.png" width="1170" height="2532" loading="lazy" decoding="async"
-                   alt="The Needs you tray on a phone. Frontend asks for network access to registry.npmjs.org, with Deny, Always for this agent, Always for this project and Allow once buttons. Below it, the Docs agent asks a question and there is a box for the answer.">
+                   alt="The Needs you tray on a phone. Frontend requests network access to registry.npmjs.org, with Deny, Always for this agent, Always for this project and Allow once buttons. Below it, the Docs agent asks a question, with an answer box.">
             </picture>
             <figcaption>Needs you on a phone, with a network request and a question.</figcaption>
           </figure>
@@ -288,30 +274,28 @@
 
         <div class="pair flip">
           <div class="prose">
-            <h3>Checking what they changed</h3>
+            <h3>Branches and pull requests</h3>
             <p>
-              Every agent works in its own copy of the repo, on its own branch.
-              When a turn ends, Squadroom commits what changed, so you can go
-              through the work one turn at a time. Nothing goes to GitHub until you
-              approve it. Then Squadroom pushes the branch and opens a pull
-              request.
+              Each agent works on its own branch in its own copy of the repo,
+              and every finished turn is committed, so the work can be reviewed
+              turn by turn. Nothing reaches GitHub until it is approved; then
+              Squadroom pushes the branch and opens a pull request.
             </p>
-            <h3>Stopping a squad that keeps going</h3>
+            <h3>Runaway guard</h3>
             <p>
-              A tab pauses by itself if one message from you has led to 40 agent
-              turns, or has kept the squad busy for two hours, or if two agents
-              have sent each other 12 messages without a new commit. You look at
-              what happened and press Resume if it's fine. You can also pause a
-              tab, a project or everything yourself.
+              A tab pauses itself after 40 agent turns from one message, after
+              2 hours busy, or after 12 messages between two agents with no new
+              commit. Resume continues it. A tab, a project or everything can be
+              paused by hand at any time.
             </p>
           </div>
           <figure class="shot">
             <picture>
               <source media="(prefers-color-scheme: dark)" srcset="assets/changes-pr-dark.png">
               <img src="assets/changes-pr-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                   alt="The Changes dialog for the Backend agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one turn's commit opened to show its diff.">
+                   alt="The Changes dialog for the Backend agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one turn's commit expanded to show its diff.">
             </picture>
-            <figcaption>One agent's changes, with its branch, its pull request and each turn's commit.</figcaption>
+            <figcaption>One agent's branch, pull request and per-turn commits.</figcaption>
           </figure>
         </div>
       </div>
@@ -322,34 +306,30 @@
         <div class="prose">
           <h2 id="roles-title">Roles</h2>
           <p>
-            A role is a prompt with a name. It tells the agent what its job is
-            and how to work with the others. Squadroom comes with eight, and
-            when you add an agent you pick one from the list.
+            A role is a named prompt that sets an agent's job and how it works
+            with the rest of the squad. Eight are built in.
           </p>
           <p>
-            To make your own, open <strong>Settings</strong>, then
-            <strong>Roles</strong>, then <strong>New role</strong>. You give it a
-            name, a one-line description, whether it edits or only looks,
-            which agent it suits (Claude Code or Codex for now) and a prompt of
-            up to 3,500 characters. You can also rewrite the prompt of a built-in role, and
-            reset it later.
+            A custom role has a name, a one-line description, edit or look-only
+            access, a suggested agent (Claude Code or Codex for now) and a
+            prompt of up to 3,500 characters. Built-in prompts can be rewritten
+            and reset, and any single agent's prompt can be overridden without
+            changing its role.
           </p>
           <p>
-            When you add an agent, you can still change its prompt for that one
-            agent without touching the role. A tab you like can be saved as a
-            template, with its agents, roles and automatic hand-offs, and used
-            again for a new tab.
+            A tab can be saved as a template with its agents, roles and
+            hand-offs.
           </p>
         </div>
         <ul class="roles" aria-label="Built-in roles">
-          <li><b>Orchestrator</b><span class="access">looks only</span><p>Splits your goal into parts, hands them out to the other agents and gets their work reviewed. It doesn't write code itself.</p></li>
-          <li><b>Planner</b><span class="access">looks only</span><p>Turns a goal into a short plan in order, with a way to check each step.</p></li>
-          <li><b>Architect</b><span class="access">looks only</span><p>Decides how the code is split up and how the parts talk to each other, then checks commits against that.</p></li>
-          <li><b>Lead</b><span class="access">edits</span><p>Writes the code for the area it's given and reports back when it's done.</p></li>
-          <li><b>Pair Lead</b><span class="access">edits</span><p>Takes your requests directly and has a Reviewer check its work before it reports back.</p></li>
-          <li><b>Designer</b><span class="access">edits</span><p>Works on layout, styling and accessibility in the parts it's given.</p></li>
-          <li><b>Reviewer</b><span class="access">looks only</span><p>Reads the other agents' commits and reports problems, most serious first.</p></li>
-          <li><b>Tester</b><span class="access">edits</span><p>Writes and runs tests, and when one fails it says the exact command to run it again.</p></li>
+          <li><b>Orchestrator</b><span class="access">look-only</span><p>Splits the goal into parts, hands them out and gets them reviewed.</p></li>
+          <li><b>Planner</b><span class="access">look-only</span><p>Writes a short ordered plan with a check for each part.</p></li>
+          <li><b>Architect</b><span class="access">look-only</span><p>Sets modules and interfaces up front and checks commits against them.</p></li>
+          <li><b>Lead</b><span class="access">edits</span><p>Builds its assigned area and reports back.</p></li>
+          <li><b>Pair Lead</b><span class="access">edits</span><p>Takes requests directly and has a Reviewer check the work before reporting.</p></li>
+          <li><b>Designer</b><span class="access">edits</span><p>Handles layout, styling and accessibility in its area.</p></li>
+          <li><b>Reviewer</b><span class="access">look-only</span><p>Reads commits and reports problems, most serious first.</p></li>
+          <li><b>Tester</b><span class="access">edits</span><p>Writes and runs tests and gives the exact command for each failure.</p></li>
         </ul>
       </div>
     </section>
@@ -360,42 +340,35 @@
         <div class="split">
           <div class="prose">
             <p>
-              <strong>A project</strong> is usually a GitHub repo. It can also
-              be a new local folder, or no files at all if you only want agents
-              to talk something through. You can have several projects going.
+              A <strong>project</strong> is a GitHub repo, a new local folder,
+              or no files at all for agents that only discuss.
             </p>
             <p>
-              <strong>A tab</strong> is one piece of work inside a project, such
-              as building a feature, a security review or the docs. Tabs run at
-              the same time, and each has its own agents.
+              A <strong>tab</strong> is one piece of work in a project, such as
+              a feature, a security review or the docs. Tabs run concurrently.
             </p>
             <p>
-              <strong>A squad</strong> is the set of agents in a tab. It can be
-              one agent, a pair, or a team with an Orchestrator and up to seven
-              other agents, and you can add more agents by hand. You can mix
-              kinds of agent in the same squad, so a Claude Code agent can write
-              the code while a Codex agent reviews it.
+              A <strong>squad</strong> is the set of agents in a tab: one agent,
+              a pair, or an Orchestrator with up to seven others. Vendors can be
+              mixed, so Claude Code can write while Codex reviews.
             </p>
           </div>
           <div class="prose">
             <p>
-              Each agent gets its own name and model, a thinking level if the
-              model has one, and either edits in its own folder or only looks.
+              Each agent has its own name, model and, where the model has one,
+              thinking level. It either edits in its own copy of the repo or
+              only looks.
             </p>
             <p>
-              There are six kinds of agent to choose from, listed under
-              <a href="#tools">Which agents you can use</a> below.
-            </p>
-            <p>
-              Up to six agents can work at once, three per account or key. The
-              rest wait their turn.
+              Up to six turns run at once, three per account or key; the rest
+              queue.
             </p>
           </div>
         </div>
 
         <ul class="tree" aria-label="Example: three projects, their tabs and the agents in each tab">
           <li class="proj">
-            <p>Weather Station <span>a GitHub repo</span></p>
+            <p>Weather Station <span>GitHub repo</span></p>
             <ul class="tabs">
               <li class="tab"><p>Build</p>
                 <ul class="agents">
@@ -410,7 +383,7 @@
             </ul>
           </li>
           <li class="proj">
-            <p>recipe-app <span>a new local folder</span></p>
+            <p>recipe-app <span>new local folder</span></p>
             <ul class="tabs">
               <li class="tab"><p>Main</p>
                 <ul class="agents">
@@ -421,48 +394,42 @@
             </ul>
           </li>
           <li class="proj">
-            <p>Naming ideas <span>no files, talk only</span></p>
+            <p>Naming ideas <span>no files</span></p>
             <ul class="tabs">
               <li class="tab"><p>Main</p><ul class="agents"><li>Ideas <small>Claude Code</small></li></ul></li>
             </ul>
           </li>
         </ul>
-        <p class="note">The same three projects as in the first screenshot.</p>
+        <p class="note">The three projects from the first screenshot.</p>
       </div>
     </section>
 
     <section id="tools" aria-labelledby="tools-title">
       <div class="wrap split">
         <div class="prose">
-          <h2 id="tools-title">Which agents you can use</h2>
+          <h2 id="tools-title">Agents</h2>
           <p>
-            You can pick any of these when you add an agent or set up a team,
-            and mix them in one squad. Each one runs with your own account or
-            API key.
+            Agents run on the owner's own subscriptions or API keys, and one
+            squad can mix any of them.
           </p>
           <p>
-            Some of them can only look for now. An agent that only looks can
-            read the code, run commands and message the other agents, but it
-            can't change files, so it suits a Reviewer or a Planner. Claude Code
-            and Codex ask you before they run a command. The others may run some
-            commands on their own, inside a macOS sandbox.
+            Look-only agents read code, run commands and message other agents,
+            but change no files.
           </p>
           <p>
-            Claude Code agents that can edit can also make images with Krea,
-            which is handy when you're trying out a design. You turn it on for
-            each project. An image costs a few cents, charged to the tab, and
-            one turn can make at most 8 images and spend at most $1. The images
-            are saved in the agent's <code>design/</code> folder and committed
-            with its turn.
+            Claude Code agents with edit access can generate images with Krea,
+            turned on per project. An image costs a few cents, charged to the
+            tab; a turn is capped at 8 images and $1. Images are saved to
+            <code>design/</code> and committed with the turn.
           </p>
         </div>
-        <ul class="reqs" aria-label="Agents you can use">
-          <li><b>Claude Code</b><span>On your Claude plan. Edits in its own folder or only looks.</span></li>
-          <li><b>Codex</b><span>On your ChatGPT login. Edits or only looks.</span></li>
-          <li><b>Grok Build</b><span>With an xAI API key. Only looks for now.</span></li>
-          <li><b>Gemini CLI</b><span>With a Gemini API key. Only looks for now.</span></li>
-          <li><b>Kimi Code</b><span>On your Kimi Code membership. Only looks for now.</span></li>
-          <li><b>OpenCode</b><span>With an API key for the model you choose: GPT-5.6 Luna, Claude Haiku 4.5, DeepSeek V4 Pro, DeepSeek V4.1 Flash, Kimi K3, GLM-5.3, GLM-5.3-Flash, or Qwen 3.8 Max through OpenRouter. Only looks for now, and needs the project's network turned on.</span></li>
+        <ul class="reqs" aria-label="Supported agents">
+          <li><b>Claude Code</b><span>Claude plan or Anthropic API key. Edits or look-only.</span></li>
+          <li><b>Codex</b><span>ChatGPT login or OpenAI API key. Edits or look-only.</span></li>
+          <li><b>Grok Build</b><span>xAI API key. Look-only for now.</span></li>
+          <li><b>Gemini CLI</b><span>Gemini API key. Look-only for now.</span></li>
+          <li><b>Kimi Code</b><span>Kimi Code membership. Look-only for now.</span></li>
+          <li><b>OpenCode</b><span>API key for the chosen model: GPT-5.6 Luna, Claude Haiku 4.5, DeepSeek V4 Pro, DeepSeek V4.1 Flash, Kimi K3, GLM-5.3, GLM-5.3-Flash, or Qwen 3.8 Max via OpenRouter. Look-only for now; needs the project's network on.</span></li>
         </ul>
       </div>
     </section>
@@ -472,38 +439,35 @@
         <div class="prose">
           <h2 id="spend-title">Spend limits</h2>
           <p>
-            Agents that run on a subscription, such as your Claude plan or your
-            ChatGPT login, cost nothing extra. The limits here are for API keys
-            you pay for by use, and there are two kinds.
+            Agents on a subscription (Claude plan, ChatGPT login, Kimi Code
+            membership) cost nothing extra. Metered API keys have two limits.
           </p>
           <p>
-            <strong>Each tab has a spend limit.</strong> It's $5 unless you
-            change it from the tab's menu. When a tab reaches its limit it
-            pauses until you press <strong>Reset spend</strong>, which needs a
-            code from your e-mail. Turns that are already running can take it a
-            little over. If an agent doesn't report what a turn used, the turn
-            is charged the most it could have cost, and the tab pauses.
+            <strong>Per tab.</strong> Each tab has a spend limit, $5 by
+            default, set from the tab's menu anywhere from $0.01 to $1,000. A
+            tab that reaches it pauses until <strong>Reset spend</strong>,
+            which needs an e-mailed code. Cost comes from each turn's reported
+            usage. A turn whose usage can't be read is charged the most it
+            could have cost and pauses the tab. A key refused with 401 or 403
+            before any output costs nothing.
           </p>
           <p>
-            <strong>Each paid key needs a monthly limit at the provider.</strong>
-            Before you add a paid key, set a monthly limit on it at the
-            provider's site, then enter that number here; Squadroom won't hand
-            the key to an agent until you do. The provider's limit is the one
-            that really holds, because Squadroom's own figures are estimates.
+            <strong>Per key, at the provider.</strong> Every paid key needs a
+            monthly cap set at the provider and entered with the key; no key is
+            handed to an agent until then. The provider's cap is the hard
+            ceiling, since Squadroom's own figures are estimates.
           </p>
           <p>
-            There are no separate limits for a whole project or for a single
-            agent. The Overview page shows what each tab and each key has spent
-            this month.
+            The Overview page shows this month's spend per tab and per key.
           </p>
         </div>
         <figure class="shot">
           <picture>
             <source media="(prefers-color-scheme: dark)" srcset="assets/keys-connections-dark.png">
             <img src="assets/keys-connections-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                 alt="Settings, Keys and connections. Three keys are listed by their last four characters: a Claude Code login, a GitHub token and an xAI API key with a cap of $25 a month. Below them, connection panels show that the installed Claude Code and Codex match the tested versions.">
+                 alt="Settings, Keys and connections. Three keys listed by their last four characters: a Claude Code login, a GitHub token and an xAI API key with a $25 monthly cap. Below them, connection panels show the installed Claude Code and Codex matching the tested versions.">
           </picture>
-          <figcaption>Keys and connections. The xAI key shows the $25 monthly cap that was set at xAI.</figcaption>
+          <figcaption>Keys and connections. The xAI key carries the $25 monthly cap set at xAI.</figcaption>
         </figure>
       </div>
     </section>
@@ -513,27 +477,26 @@
         <div class="prose">
           <h2 id="safety-title">Safety</h2>
           <p>
-            Coding agents run commands, and any of them could be tricked by
-            something it reads. Here is what Squadroom does about that.
+            Coding agents run commands and can be steered by anything they
+            read. The measures Squadroom takes are listed alongside.
           </p>
           <p>
-            There are also things it doesn't protect against. All agents run as
-            the same <code>agent</code> user, so a running agent can read another
-            running agent's environment, keys included. Treat every key you give
-            agents as readable by all of them, and set a limit on paid keys at
-            the provider. Once you let an agent reach a site, it really can.
-            It's made for one person using their own Mac, and it isn't safe to
-            let other people use it. The details are in
+            Known limits: all agents run as the same OS user, so a running agent
+            can read another running agent's environment, keys included. Treat
+            every key as readable by all agents and cap paid keys at the
+            provider. Approved network access is real access. Squadroom is built
+            for one person on their own machine, not as a multi-user sandbox.
+            Details are in
             <a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">docs/architecture.md</a>.
           </p>
         </div>
         <ul class="facts">
-          <li><strong>A separate macOS user</strong>Agents run as a hidden <code>agent</code> user that can't read your home folder.</li>
-          <li><strong>Each agent has its own copy</strong>Each agent can only write inside its own copy of the repo. Each tool is also locked in by its own sandbox or by macOS's.</li>
-          <li><strong>You decide what reaches the network</strong>A Claude Code or Codex agent that wants to reach a site, say the npm registry, asks you first. You can allow it once, always for that agent, or always for the project. Grok Build, Gemini CLI, Kimi Code and OpenCode get no network at all unless you turn network on for the whole project, and OpenCode needs it on to run.</li>
-          <li><strong>No GitHub access for agents</strong>Agents never get a GitHub token, so Squadroom does the pushing for them. It only pushes to branches starting with <code>console/</code>, and only in repos where a GitHub ruleset protects the base branch from force pushes, deletion and direct pushes. You have to set up that ruleset yourself. Before each push it checks that the push holds none of the keys it gave out.</li>
-          <li><strong>Keys are hidden in what it saves</strong>Squadroom hides the keys it handed out, and anything in a common key format, in everything it stores. Any other secret an agent prints is stored as printed.</li>
-          <li><strong>Sign-in</strong>Only your GitHub account can sign in. If you set up e-mail, you also enter a code it sends you. Changing keys, raising a limit, resetting spend, turning on a project's network or image tools, or adding an "always" rule needs a code entered in the last 8 hours. Without e-mail set up, those are refused.</li>
+          <li><strong>Separate OS user</strong>Agents run as a hidden <code>agent</code> user that can't read the owner's home folder.</li>
+          <li><strong>One copy per agent</strong>Each agent writes only inside its own copy of the repo. Each tool runs inside its own sandbox or a macOS sandbox profile.</li>
+          <li><strong>Network by approval</strong>Claude Code and Codex ask per site, and an approval can be once, always for that agent, or always for the project. Grok Build, Gemini CLI, Kimi Code and OpenCode have no network unless it is turned on for the project.</li>
+          <li><strong>No GitHub token for agents</strong>Squadroom pushes for them, only to <code>console/</code> branches, only in repos whose base branch is protected by a GitHub ruleset (no force push, deletion or direct push), and only after checking the push holds none of the keys it handed out.</li>
+          <li><strong>Redaction</strong>Handed-out keys and common key formats are redacted from stored output. Other secrets an agent prints are stored as printed.</li>
+          <li><strong>Sign-in</strong>Only the owner's GitHub account, plus an e-mailed code when e-mail is configured. Changing keys, raising a limit, resetting spend, turning on network or image tools, or adding an "always" rule needs a code entered in the last 8 hours; without e-mail these actions are refused.</li>
         </ul>
       </div>
     </section>
@@ -541,35 +504,33 @@
     <section id="start" class="band" aria-labelledby="start-title">
       <div class="wrap split">
         <div>
-          <h2 id="start-title">What you need</h2>
-          <p class="after" style="margin: 0 0 12px">
-            There's no installer yet. Expect to spend an afternoon setting it up
-            the first time.
-          </p>
+          <h2 id="start-title">Requirements</h2>
           <ul class="reqs" aria-label="Requirements">
-            <li><b>A Mac</b><span>Any Mac with about 10 GB of free disk. Linux and Windows aren't supported.</span></li>
+            <li><b>macOS</b><span>macOS today; Linux and Windows next. At least 40 GB of free disk, which the setup script checks.</span></li>
             <li><b>Node.js 24</b><span>From Homebrew or the official installer.</span></li>
-            <li><b>sudo, once</b><span>The setup script creates the <code>agent</code> user and installs the agent programs and a small launcher.</span></li>
-            <li><b>An https address</b><span>Sign-in needs one, and it lets you use Squadroom from your phone. The free Tailscale app is the easiest way to get one.</span></li>
-            <li><b>Your own accounts</b><span>A GitHub OAuth app for sign-in, a Resend account for the e-mailed codes, and accounts or keys for the agents you want to use.</span></li>
+            <li><b>sudo, once</b><span>For the setup script, which creates the <code>agent</code> user and installs the agent CLIs and a small launcher.</span></li>
+            <li><b>https address</b><span>Needed for sign-in and for phone access. Tailscale Serve is the easy way.</span></li>
+            <li><b>Accounts</b><span>A GitHub OAuth app for sign-in, a Resend account for e-mailed codes (adding keys needs one), and accounts or keys for the agents in use.</span></li>
           </ul>
         </div>
         <div>
-          <h3>How to start</h3>
+          <h3>Quick start</h3>
           <pre aria-label="Commands to install and start Squadroom"><code><span class="p">$ </span>git clone https://github.com/squadroom/squadroom.git
 <span class="p">$ </span>cd squadroom &amp;&amp; npm ci
 <span class="p">$ </span>sudo zsh scripts/console/setup-agent-user.sh
-<span class="p">$ </span>tailscale serve --bg 3011    <span class="c"># your https address</span>
+<span class="p">$ </span>tailscale serve --bg 3011    <span class="c"># https address</span>
 <span class="p">$ </span>cp .env.example .env.local   <span class="c"># sign-in and mail settings</span>
 <span class="p">$ </span>npm run build
 <span class="p">$ </span>npm run web -- --port 3011
-<span class="p">$ </span>npm run console:worker       <span class="c"># in a second terminal</span></code></pre>
+<span class="p">$ </span>npm run console:worker       <span class="c"># second terminal</span></code></pre>
           <p class="after">
-            Then open <code>https://&lt;your address&gt;/console</code>, which is
-            Squadroom's main page, sign in with GitHub and add your keys on the
-            Keys page. The
+            Then open <code>https://&lt;address&gt;/console</code>, sign in with
+            GitHub and add keys under Settings. The
             <a href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">setup guide</a>
-            goes through each step, including signing Claude Code and Codex in.
+            covers every step, including signing Claude Code and Codex in for
+            the agent user, and the
+            <a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">architecture doc</a>
+            describes how the pieces fit.
           </p>
         </div>
       </div>
@@ -579,21 +540,19 @@
   <footer>
     <div class="wrap">
       <div>
-        <p><strong>Squadroom</strong> is open source under the
+        <p><strong>Squadroom</strong> is free and open source under the
           <a href="https://github.com/squadroom/squadroom/blob/main/LICENSE">MIT licence</a>.</p>
         <p>
-          It's an independent project, not affiliated with or endorsed by
-          Anthropic, OpenAI, Google, xAI, Moonshot AI, DeepSeek, Krea or any
-          other provider. You use each agent with your own account and under
-          that provider's terms. Product
-          names belong to their owners.
+          Independent project, not affiliated with or endorsed by Anthropic,
+          OpenAI, Google, xAI, Moonshot AI, DeepSeek, Zhipu, Alibaba, Krea or
+          any other provider. Product names belong to their owners.
         </p>
       </div>
       <ul>
-        <li><a href="https://github.com/squadroom/squadroom">Source on GitHub</a></li>
+        <li><a href="https://github.com/squadroom/squadroom">Source</a></li>
         <li><a href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Setup guide</a></li>
         <li><a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">How it works</a></li>
-        <li><a href="https://github.com/squadroom/squadroom/blob/main/SECURITY.md">Report a security problem</a></li>
+        <li><a href="https://github.com/squadroom/squadroom/blob/main/SECURITY.md">Security reporting</a></li>
         <li><a href="https://github.com/squadroom/squadroom/blob/main/CONTRIBUTING.md">Contributing</a></li>
         <li><a href="https://github.com/squadroom/squadroom/issues">Issues</a></li>
       </ul>
