@@ -279,8 +279,8 @@
               and every finished turn is committed, so the work can be reviewed
               turn by turn. Nothing is pushed until the push is approved, once
               or always for that agent; Squadroom then pushes the branch and
-              opens a pull request. Approving a commit in Changes is a separate
-              review record and does not push.
+              opens a pull request. Approving a commit in Changes is separate
+              and does not push; a tab with steps needs it to move on.
             </p>
           </div>
           <figure class="shot">
@@ -446,11 +446,19 @@
             routes, and a new tab can start from one.
           </p>
           <p>
-            Next is a document workspace, where a squad takes a project from
-            brief to product backlog before any code is written. The same
-            squad setup will serve other document work too, with agents in
-            their roles drafting, reviewing and revising specs, research
-            reports, plans or proposals.
+            The built-in <strong>Document review</strong> template takes a
+            project from brief to product backlog before any code is written.
+            A Lead on Claude Code writes each step's document in Markdown and
+            a Reviewer on Codex reviews it, the two passing drafts and findings
+            back and forth by routes. The steps are Brief, Design Principles,
+            an optional Detailed Design, Architecture with ADRs, Delivery Plan
+            and Product Backlog. Each step can change only its own files, its
+            document must be approved before the next step starts, and
+            decisions left for later go in <code>parking-lot.md</code>.
+          </p>
+          <p>
+            Custom step templates for any document workflow, with your own
+            steps and files, are next.
           </p>
         </div>
       </div>
