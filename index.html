@@ -103,7 +103,7 @@
       mask-image: linear-gradient(to bottom, #000 20%, transparent 85%);
       -webkit-mask-image: linear-gradient(to bottom, #000 20%, transparent 85%);
     }
-    .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 48px; align-items: center; }
+    .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
     .tag { display: inline-flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none; }
     .tag li { font: 600 12px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); }
     .tag li:first-child { background: var(--orange-soft); color: var(--orange); border-color: transparent; }
@@ -118,42 +118,15 @@
     .btn.ghost:hover { color: var(--ink); background: var(--card); }
     .btn svg { width: 18px; height: 18px; }
 
-    /* ── The illustration: a Console window with a tab of agents ── */
-    .console { margin: 0; }
-    .console figcaption { font-size: 14px; color: var(--ink-3); margin-top: 14px; text-align: center; }
-    .frame { background: var(--card); border: 1.5px solid var(--ink); border-radius: 18px; box-shadow: var(--shadow), 10px 10px 0 var(--teal-soft); overflow: hidden; }
-    .chrome { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1.5px solid var(--ink); background: var(--paper-2); }
-    .dots { display: flex; gap: 6px; }
-    .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
-    .addr { flex: 1; min-width: 0; font: 400 12px/1 var(--mono); color: var(--ink-3); background: var(--card); border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .needs { font: 600 11px/1 var(--mono); padding: 6px 8px; border-radius: 7px; background: var(--gold-soft); color: var(--gold); white-space: nowrap; }
-    .tabs { display: flex; gap: 4px; padding: 10px 14px 0; border-bottom: 1px solid var(--line); overflow: hidden; }
-    .tabs span { font: 600 12px/1 var(--body); padding: 9px 12px; border-radius: 9px 9px 0 0; color: var(--ink-3); white-space: nowrap; }
-    .tabs span.on { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-bottom-color: var(--paper); margin-bottom: -1px; }
-    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px; background: var(--paper); position: relative; }
-    .agent { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 10px; min-height: 190px; display: flex; flex-direction: column; gap: 7px; position: relative; }
-    .agent header { display: flex; align-items: center; gap: 7px; font: 700 13px/1.1 var(--body); }
-    .agent header b { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font: 700 11px/1 var(--mono); color: #fff; flex: none; }
-    .agent small { display: block; font: 400 10.5px/1.2 var(--mono); color: var(--ink-3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .agent .who { min-width: 0; }
-    .a1 header b { background: var(--orange); }
-    .a2 header b { background: var(--teal); }
-    .a3 header b { background: var(--violet); }
-    .line { height: 7px; border-radius: 4px; background: var(--paper-2); }
-    .line.w9 { width: 92%; } .line.w7 { width: 72%; } .line.w5 { width: 52%; } .line.w8 { width: 82%; }
-    .tool { font: 400 10.5px/1.3 var(--mono); color: var(--ink-2); background: var(--paper); border: 1px dashed var(--line); border-radius: 7px; padding: 5px 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tool::before { content: "▸ "; color: var(--ink-3); }
-    .msg { font: 600 10.5px/1.3 var(--mono); border-radius: 7px; padding: 6px 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .a1 .msg { background: var(--orange-soft); color: var(--orange); }
-    .a2 .msg { background: var(--teal-soft); color: var(--teal); }
-    .a3 .msg { background: var(--violet-soft); color: var(--violet); }
-    .commit { margin-top: auto; font: 400 10px/1 var(--mono); color: var(--ink-3); display: flex; align-items: center; gap: 6px; }
-    .commit::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 2px solid var(--teal); }
-    .busy { position: absolute; top: 12px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); animation: pulse 1.6s ease-in-out infinite; }
-    @keyframes pulse { 50% { opacity: .25; } }
-    .composer { display: flex; gap: 8px; align-items: center; padding: 0 12px 12px; background: var(--paper); }
-    .composer div { flex: 1; font: 400 12px/1 var(--mono); color: var(--ink-3); border: 1px solid var(--line); background: var(--card); border-radius: 9px; padding: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .composer span { font: 600 12px/1 var(--body); padding: 10px 12px; border-radius: 9px; background: var(--ink); color: var(--paper); }
+    /* ── Screenshots: the hero and the gallery ──────────────── */
+    .shot { margin: 0; }
+    .shot img { display: block; width: 100%; height: auto; border: 1.5px solid var(--ink); border-radius: 14px; background: var(--card); }
+    .shot figcaption { font-size: 14px; color: var(--ink-3); margin-top: 12px; }
+    .console img { border-radius: 18px; box-shadow: var(--shadow), 10px 10px 0 var(--teal-soft); }
+    .console figcaption { text-align: center; margin-top: 16px; }
+    .gallery { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, .42fr); gap: 28px; align-items: start; }
+    .gallery .shot img { box-shadow: var(--shadow); }
+    .gallery strong { color: var(--ink); }
 
     /* ── Sections ───────────────────────────────────────────── */
     section { padding: 76px 0; }
@@ -213,18 +186,17 @@
       .hero .wrap, .safety, .start, footer .wrap { grid-template-columns: minmax(0, 1fr); }
       .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .hero { padding-top: 24px; }
+      .gallery { grid-template-columns: minmax(0, 1fr); }
+      .gallery .phone { max-width: 320px; }
     }
     @media (max-width: 620px) {
       body { font-size: 16px; }
       section { padding: 56px 0; }
       .cards { grid-template-columns: minmax(0, 1fr); }
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .grid .a3 { display: none; }
-      .agent { min-height: 170px; }
       .reqs li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
       .btn { flex: 1 1 auto; justify-content: center; }
       footer ul { grid-template-columns: minmax(0, 1fr); }
-      .frame { box-shadow: var(--shadow), 6px 6px 0 var(--teal-soft); }
+      .console img { box-shadow: var(--shadow), 6px 6px 0 var(--teal-soft); }
     }
   </style>
 </head>
@@ -275,61 +247,47 @@
           </div>
         </div>
 
-        <!--
-          FUTURE SCREENSHOT: when a real screenshot of the Console exists,
-          replace the whole <div class="frame"> below with, for example:
-            <img src="screenshot.png" width="1280" height="800"
-                 alt="The Squadroom Console: a tab with three agent windows"
-                 style="width:100%;height:auto;border-radius:18px;border:1.5px solid var(--ink)">
-          and keep the <figcaption>. Consider a dark-mode variant with <picture>.
-        -->
-        <figure class="console">
-          <div class="frame" aria-hidden="true">
-            <div class="chrome">
-              <div class="dots"><i></i><i></i><i></i></div>
-              <div class="addr">https://your-mac.example/console</div>
-              <div class="needs">Needs you · 1</div>
-            </div>
-            <div class="tabs">
-              <span class="on">sign-in fix</span>
-              <span>docs</span>
-              <span>+ tab</span>
-            </div>
-            <div class="grid">
-              <div class="agent a1">
-                <header><b>L</b><div class="who">Lead<small>Claude Code · edit</small></div></header>
-                <div class="line w9"></div>
-                <div class="line w7"></div>
-                <div class="tool">npm test</div>
-                <div class="msg">team_ask → Reviewer</div>
-                <div class="line w5"></div>
-                <div class="commit">turn 4 committed</div>
-              </div>
-              <div class="agent a2">
-                <span class="busy"></span>
-                <header><b>R</b><div class="who">Reviewer<small>Codex · look only</small></div></header>
-                <div class="line w8"></div>
-                <div class="tool">git diff main</div>
-                <div class="line w9"></div>
-                <div class="msg">team_reply: 2 findings</div>
-                <div class="commit">reading branch</div>
-              </div>
-              <div class="agent a3">
-                <header><b>S</b><div class="who">Scout<small>Grok Build · look only</small></div></header>
-                <div class="line w7"></div>
-                <div class="line w9"></div>
-                <div class="tool">read src/auth</div>
-                <div class="msg">team_send → Lead</div>
-                <div class="commit">idle</div>
-              </div>
-            </div>
-            <div class="composer">
-              <div>Message the Lead…</div>
-              <span>Send</span>
-            </div>
-          </div>
-          <figcaption>Illustration: a project tab with three agent windows talking through team tools.</figcaption>
+        <figure class="shot console">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/console-desktop-dark.png">
+              <img src="assets/console-desktop-light.png" width="2880" height="1800" fetchpriority="high" decoding="async"
+                   alt="Squadroom with the Weather Station project open: four agent windows side by side, Lead and Backend working, Frontend waiting for the owner and Reviewer idle after posting its review, with the team timeline above them and two items in Needs you.">
+            </picture>
+          <figcaption>A project tab with four agents: a Lead, Backend and Frontend developers, and a Reviewer that only reads. Demo data.</figcaption>
         </figure>
+      </div>
+    </section>
+
+    <section id="screens" class="band" aria-labelledby="screens-title">
+      <div class="wrap">
+        <p class="kicker">See it</p>
+        <h2 id="screens-title">Agents that talk, changes you can check.</h2>
+        <div class="gallery">
+          <figure class="shot">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/team-messages-dark.png">
+              <img src="assets/team-messages-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                   alt="The Team panel above the agent windows: Lead sends Frontend and Backend their parts, Backend reports a commit, Lead asks Reviewer for a review and Reviewer answers.">
+            </picture>
+            <figcaption><strong>Team messages.</strong> Every message between a tab's agents, asks and their answers in one timeline.</figcaption>
+          </figure>
+          <figure class="shot">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/changes-pr-dark.png">
+              <img src="assets/changes-pr-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                   alt="Backend's Changes dialog: its branch, pull request #42 opened, an Approve button, the five files changed against main, and one turn's commit expanded to its diff.">
+            </picture>
+            <figcaption><strong>Changes and pull requests.</strong> Each turn is a commit; push the branch and open its pull request when you approve.</figcaption>
+          </figure>
+          <figure class="shot phone">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/phone-needs-you-dark.png">
+              <img src="assets/phone-needs-you-light.png" width="1170" height="2532" loading="lazy" decoding="async"
+                   alt="The Needs you tray on a phone: Frontend asks for network access to registry.npmjs.org with Allow once and Always buttons, and Docs asks a question with an answer box.">
+            </picture>
+            <figcaption><strong>Needs you, on a phone.</strong> Approvals and questions wait in one tray.</figcaption>
+          </figure>
+        </div>
       </div>
     </section>
 
