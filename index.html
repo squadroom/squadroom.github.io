@@ -165,7 +165,7 @@
         Squadroom
       </a>
       <nav class="links" aria-label="Main">
-        <a href="#together">Messaging</a>
+        <a href="#together">Teamwork</a>
         <a href="#roles">Roles</a>
         <a href="#layout">Projects</a>
         <a href="#agents">Agents</a>
@@ -182,17 +182,18 @@
       <div class="wrap">
         <h1 id="hero-title">Squadroom</h1>
         <p class="lede">
-          Squadroom runs Claude Code, Codex, Grok Build, Gemini CLI, Kimi Code
-          and OpenCode as one squad. The agents message each other through
-          team tools, each in a built-in or custom role, and come to you only
-          when a decision is needed.
+          Squadroom runs teams of coding agents. Claude Code, Codex, Gemini
+          CLI, Grok Build, Kimi Code and OpenCode agents can sit in the same
+          team, each with a role, and they work through the job together: they
+          message each other, hand work back and forth and review each other's
+          changes. They come back to you only when they need a decision.
         </p>
         <p class="lede">
-          It holds several projects at once. A project is a repo or folder;
-          each tab in it is one piece of work with its own squad of agents and
-          its own spend limit. Squadroom runs locally as a web app behind an
-          https address, so it works from a phone too. macOS today; Linux and
-          Windows next.
+          Work is split into projects, usually one per repo, and tabs, one per
+          piece of work such as a feature or a review. Each tab has its own
+          team and its own spend limit, and tabs run side by side. Squadroom
+          runs on your own machine and works from a phone too. macOS today;
+          Linux and Windows next.
         </p>
         <div class="cta">
           <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Setup guide</a>
@@ -213,38 +214,36 @@
 
     <section id="together" class="band" aria-labelledby="together-title">
       <div class="wrap">
-        <h2 id="together-title">Messaging</h2>
+        <h2 id="together-title">How the agents work together</h2>
         <div class="split">
           <div class="prose">
             <p>
-              A turn is one prompt to an agent and its reply. Each agent has
-              team tools to message another agent, ask a question and get the
-              answer back, merge another agent's work, claim files before
-              editing them, and put another agent on hold, which keeps team
-              messages from reaching it for up to 30 minutes. A message
-              arrives as the recipient's next prompt once its current turn
-              ends.
+              Agents talk to each other directly. One can send another a
+              message, ask it a question and wait for the answer, pull in its
+              changes, or claim the files it's about to edit so nobody else
+              touches them. A message waits until the other agent has finished
+              its current reply, then arrives as its next prompt.
             </p>
             <p>
-              A route passes an agent's final message from each turn to
-              another agent, optionally only when it contains a given phrase.
-              With a route from Lead to Reviewer on "ready for review", the
-              Reviewer gets each finished piece as its next prompt.
+              Some hand-offs need no message at all. A route says, for
+              example, that whenever the Lead ends a reply with "ready for
+              review", that reply goes straight to the Reviewer.
             </p>
           </div>
           <div class="prose">
             <p>
-              Work starts with a goal typed into one window: the Orchestrator's
-              (the role that splits the goal and hands out parts) in a team, or
-              the Pair Lead's (a coder paired with a Reviewer) in a pair. Any
-              agent's window takes typed input at any time.
+              A job starts with one message. In a team it goes to the
+              Orchestrator, which splits the job up and hands out the parts. In
+              a pair it goes to the Pair Lead, which has the Reviewer check its
+              work before reporting back. Any agent's window still takes a
+              message at any time.
             </p>
             <p>
-              Requests that need a decision land in one
-              <strong>Needs you</strong> tray across all projects: network
-              requests, questions, push approvals, notes from agents and
-              paused tabs. The <strong>Team</strong> panel shows every message
-              between the agents in a tab.
+              Anything that needs a human decision, such as a question, a
+              request to reach a website or a branch ready to push, lands in
+              one list called <strong>Needs you</strong>, across every project.
+              The <strong>Team</strong> panel shows every message the agents
+              have sent each other.
             </p>
           </div>
         </div>
@@ -275,12 +274,14 @@
           <div class="prose">
             <h3>Branches and pull requests</h3>
             <p>
-              Each agent works on its own branch in its own copy of the repo,
-              and every finished turn is committed, so the work can be reviewed
-              turn by turn. Nothing is pushed until the push is approved, once
-              or always for that agent; Squadroom then pushes the branch and
-              opens a pull request. Approving a commit in Changes is separate
-              and does not push; a tab with steps needs it to move on.
+              Every agent works in its own copy of the repo, on its own branch.
+              Each time an agent finishes a reply, Squadroom commits whatever it
+              changed, so the history reads one reply at a time.
+            </p>
+            <p>
+              Nothing goes to GitHub until it's approved, either once or for
+              good for that agent. Squadroom then pushes the branch and opens
+              the pull request.
             </p>
           </div>
           <figure class="shot">
@@ -288,10 +289,10 @@
               <picture>
                 <source media="(prefers-color-scheme: dark)" srcset="assets/changes-pr-dark.png">
                 <img src="assets/changes-pr-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                     alt="The Changes dialog for the Backend agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one turn's commit expanded to show its diff.">
+                     alt="The Changes dialog for the Backend agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one reply's commit expanded to show its diff.">
               </picture>
             </a>
-            <figcaption>One agent's branch, pull request and per-turn commits.</figcaption>
+            <figcaption>One agent's branch, its pull request and a commit for each reply.</figcaption>
           </figure>
         </div>
       </div>
@@ -362,8 +363,8 @@
           <p>
             Claude Code agents with Code edit can generate images with Krea,
             turned on per project. An image costs $0.015 to $0.065, charged to
-            the tab; a turn is capped at 8 images and $1. Images are saved to
-            <code>design/</code> and committed with the turn.
+            the tab; one reply can make at most 8 images and spend at most $1.
+            Images are saved to <code>design/</code> and committed with the reply.
           </p>
         </div>
         <ul class="reqs" aria-label="Agents">
@@ -389,7 +390,7 @@
             <strong>Per tab.</strong> Each tab has a spend limit, $5 by
             default. A tab that reaches it pauses until <strong>Reset
             spend</strong>, which needs an e-mailed code. Cost comes from each
-            turn's reported usage; a turn whose usage can't be read is charged
+            reply's reported usage; a reply whose usage can't be read is charged
             the most it could have cost and pauses the tab.
           </p>
           <p>
@@ -399,8 +400,8 @@
             ceiling, since Squadroom's own figures are estimates.
           </p>
           <p>
-            Up to six turns run at once, three per account or key; the rest
-            queue. The Overview page shows this month's spend per tab and per
+            Up to six agents work at once, three per account or key; the rest
+            wait their turn. The Overview page shows this month's spend per tab and per
             key.
           </p>
         </div>
@@ -430,7 +431,7 @@
           <li><strong>One copy per agent</strong>Each agent writes only inside its own copy of the repo. Claude Code and Codex run in their own sandboxes; Grok Build, Gemini CLI, Kimi Code and OpenCode run inside the launcher's macOS sandbox profile.</li>
           <li><strong>Network by approval</strong>Claude Code and Codex ask per site, and an approval can be once, always for that agent, or always for the project. Grok Build, Gemini CLI, Kimi Code and OpenCode have no network unless it is turned on for the project.</li>
           <li><strong>No GitHub token for agents</strong>Squadroom pushes for them, only to <code>console/</code> branches, only in repos whose base branch is protected by a GitHub ruleset (no force push, deletion or direct push), and only after checking the push holds none of the keys it handed out.</li>
-          <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent turns or 2 hours from one message, or after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
+          <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent replies or 2 hours from one message, or after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
           <li><strong>Redaction</strong>Handed-out keys and common key formats are redacted from stored output. Other secrets an agent prints are stored as printed.</li>
           <li><strong>Sign-in</strong>Only your GitHub account, plus an e-mailed code when e-mail is configured. Changing keys, raising a limit, resetting spend, turning on network or image tools, or adding an "always" rule needs a code entered in the last 8 hours; without e-mail these actions are refused.</li>
         </ul>
