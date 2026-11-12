@@ -191,9 +191,10 @@
         <p class="lede">
           Work is split into projects, usually one per repo, and tabs, one per
           piece of work such as a feature or a review. Each tab has its own
-          team and its own spend limit, and tabs run side by side. Squadroom
-          runs on your own machine and works from a phone too. macOS today;
-          Linux and Windows next.
+          team and its own spend limit, and tabs run side by side. An agent
+          can propose a new tab with a team of its own, and it's created once
+          you approve it. Squadroom runs on your own machine and works from a
+          phone too. macOS today; Linux and Windows next.
         </p>
         <div class="cta">
           <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Setup guide</a>
@@ -240,7 +241,8 @@
             </p>
             <p>
               Anything that needs a human decision, such as a question, a
-              request to reach a website or a branch ready to push, lands in
+              request to reach a website, a branch ready to push or a
+              proposal for a new tab, lands in
               one list called <strong>Needs you</strong>, across every project.
               The <strong>Team</strong> panel shows every message the agents
               have sent each other.
@@ -282,6 +284,14 @@
               Nothing goes to GitHub until it's approved, either once or for
               good for that agent. Squadroom then pushes the branch and opens
               the pull request.
+            </p>
+            <p>
+              An agent can read the GitHub Actions results for its pull
+              request, and the end of a failing job's log. Tests that can't
+              run inside the sandbox, such as Firefox and WebKit browser
+              tests, can run on GitHub instead, and the agent works from the
+              result. The GitHub token needs <strong>Actions:
+              Read-only</strong> for this.
             </p>
           </div>
           <figure class="shot">
@@ -346,7 +356,22 @@
           <p>
             A squad can be one agent, a pair, or an Orchestrator with up to
             seven others. Each agent has its own name, model, access level
-            and, where the model has one, thinking level.
+            and, where the model has one, thinking level. The model and
+            thinking level can be changed later from <strong>Model</strong> in
+            the agent's menu, and the change applies from its next reply.
+          </p>
+          <p>
+            An agent can propose a new tab with its own squad. It gives the
+            tab a name, a goal and the members it wants, and the proposal
+            appears in Needs you. There you create it as proposed, edit the
+            team first, or decline. Nothing is created without your approval,
+            and there's no cap on how many tabs an agent can propose.
+          </p>
+          <p>
+            The agent that proposed the tab is told what you decided. It and
+            the new tab's lead can message each other across the two tabs, and
+            when the new tab's work is done its result goes back to the agent
+            that proposed it.
           </p>
         </div>
       </div>
@@ -431,7 +456,7 @@
           <li><strong>One copy per agent</strong>Each agent writes only inside its own copy of the repo. Claude Code and Codex run in their own sandboxes; Grok Build, Gemini CLI, Kimi Code and OpenCode run inside the launcher's macOS sandbox profile.</li>
           <li><strong>Network by approval</strong>Claude Code and Codex ask per site, and an approval can be once, always for that agent, or always for the project. Grok Build, Gemini CLI, Kimi Code and OpenCode have no network unless it is turned on for the project.</li>
           <li><strong>No GitHub token for agents</strong>Squadroom pushes for them, only to <code>console/</code> branches, only in repos whose base branch is protected by a GitHub ruleset (no force push, deletion or direct push), and only after checking the push holds none of the keys it handed out.</li>
-          <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent replies or 2 hours from one message, or after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
+          <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent replies or 2 hours from one message. Those two limits are the defaults, and each tab can have its own under Turn limits in the tab's menu. A tab also pauses after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
           <li><strong>Redaction</strong>Handed-out keys and common key formats are redacted from stored output. Other secrets an agent prints are stored as printed.</li>
           <li><strong>Sign-in</strong>Only your GitHub account, plus an e-mailed code when e-mail is configured. Changing keys, raising a limit, resetting spend, turning on network or image tools, or adding an "always" rule needs a code entered in the last 8 hours; without e-mail these actions are refused.</li>
         </ul>
@@ -465,6 +490,12 @@
             Orchestrator with several writers and reviewers, and any agent can
             do the writing.
           </p>
+          <p>
+            <strong>Files</strong> in each agent's menu lists the files in
+            that agent's copy of the repo, Markdown first, and opens them
+            formatted in the file panel. A document an agent has written can
+            be read there before it's committed or pushed.
+          </p>
         </div>
       </div>
     </section>
@@ -480,6 +511,7 @@
               <li><b>Tools</b><span>Node.js 24 and Git.</span></li>
               <li><b>sudo, once</b><span>For the setup script, which creates the <code>agent</code> user and installs the agent CLIs and a small launcher.</span></li>
               <li><b>https address</b><span>Needed for sign-in and for phone access. Tailscale Serve works.</span></li>
+              <li><b>GitHub token</b><span>For GitHub projects, a fine-grained token with Contents and Pull requests set to read and write. Add Actions: Read-only if agents should read check results.</span></li>
               <li><b>Accounts</b><span>A GitHub OAuth app for sign-in, a Resend account for e-mailed codes (adding keys needs one), and accounts or keys for the agents in use.</span></li>
             </ul>
           </div>
