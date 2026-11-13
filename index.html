@@ -247,6 +247,12 @@
               The <strong>Team</strong> panel shows every message the agents
               have sent each other.
             </p>
+            <p>
+              A permission request closes when the agent's reply ends, for
+              example at a time limit while you were away. It stays in Needs
+              you, marked "got no answer". You can allow it for next time,
+              have the agent ask again, or dismiss it.
+            </p>
           </div>
         </div>
         <div class="pair">
@@ -278,7 +284,16 @@
             <p>
               Every agent works in its own copy of the repo, on its own branch.
               Each time an agent finishes a reply, Squadroom commits whatever it
-              changed, so the history reads one reply at a time.
+              changed, so the history reads one reply at a time. In a GitHub
+              project the commits carry your GitHub no-reply address, so
+              GitHub and anything that deploys from it treat them as yours.
+            </p>
+            <p>
+              An agent's copy is made once and doesn't update from GitHub by
+              itself. When the base branch gets new commits there, the
+              agent's window says so, for example "main has new commits",
+              and the agent is told with its next message. It then merges
+              them into its branch itself.
             </p>
             <p>
               Nothing goes to GitHub until it's approved, either once or for
@@ -357,8 +372,9 @@
             A squad can be one agent, a pair, or an Orchestrator with up to
             seven others. Each agent has its own name, model, access level
             and, where the model has one, thinking level. The model and
-            thinking level can be changed later from <strong>Model</strong> in
-            the agent's menu, and the change applies from its next reply.
+            thinking level can be changed later: the model name in the
+            agent window's header opens a list of both. A choice is saved at
+            once and applies from the agent's next reply.
           </p>
           <p>
             An agent can propose a new tab with its own squad. It gives the
@@ -454,7 +470,7 @@
         <ul class="facts">
           <li><strong>Separate OS user</strong>Agents run as a hidden <code>agent</code> user that can't read your home folder.</li>
           <li><strong>One copy per agent</strong>Each agent writes only inside its own copy of the repo. Claude Code and Codex run in their own sandboxes; Grok Build, Gemini CLI, Kimi Code and OpenCode run inside the launcher's macOS sandbox profile.</li>
-          <li><strong>Network by approval</strong>Claude Code and Codex ask per site, and an approval can be once, always for that agent, or always for the project. Grok Build, Gemini CLI, Kimi Code and OpenCode have no network unless it is turned on for the project.</li>
+          <li><strong>Network by approval</strong>Claude Code and Codex ask per site, and an approval can be once, always for that agent, or always for the project. Each of their windows shows <strong>Network ask</strong> or <strong>Network auto</strong> in its header, and a click switches it. On Auto the agent reaches any website without asking, so it could send anything it can read to any site. Grok Build, Gemini CLI, Kimi Code and OpenCode have no network unless it is turned on for the project.</li>
           <li><strong>No GitHub token for agents</strong>Squadroom pushes for them, only to <code>console/</code> branches, only in repos whose base branch is protected by a GitHub ruleset (no force push, deletion or direct push), and only after checking the push holds none of the keys it handed out.</li>
           <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent replies or 2 hours from one message. Those two limits are the defaults, and each tab can have its own under Turn limits in the tab's menu. A tab also pauses after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
           <li><strong>Redaction</strong>Handed-out keys and common key formats are redacted from stored output. Other secrets an agent prints are stored as printed.</li>
