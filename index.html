@@ -474,6 +474,7 @@
           <li><strong>No GitHub token for agents</strong>Squadroom pushes for them, only to <code>console/</code> branches, only in repos whose base branch is protected by a GitHub ruleset (no force push, deletion or direct push), and only after checking the push holds none of the keys it handed out.</li>
           <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent replies or 2 hours from one message. Those two limits are the defaults, and each tab can have its own under Turn limits in the tab's menu. A tab also pauses after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
           <li><strong>Redaction</strong>Handed-out keys and common key formats are redacted from stored output. Other secrets an agent prints are stored as printed.</li>
+          <li><strong>What agents write stays on the page</strong>Replies are shown without raw HTML, and an image appears only if it is a file in the agent's own copy of the repo; a web address is shown as text, so a reply can't make your browser fetch anything. An HTML page an agent wrote is shown only when you click Preview, in a sandboxed frame that can't read Squadroom, with its scripts off. <strong>Run scripts</strong> is a separate button: a running script still can't read Squadroom or use HTTP, but it can pass small amounts of the page's own content out through host-name look-ups.</li>
           <li><strong>Sign-in</strong>Only your GitHub account, plus an e-mailed code when e-mail is configured. Changing keys, raising a limit, resetting spend, turning on network or image tools, or adding an "always" rule needs a code entered in the last 8 hours; without e-mail these actions are refused.</li>
         </ul>
       </div>
@@ -511,6 +512,14 @@
             that agent's copy of the repo, Markdown first, and opens them
             formatted in the file panel. A document an agent has written can
             be read there before it's committed or pushed.
+          </p>
+          <p>
+            Replies and Markdown files show maths written as
+            <code>$…$</code> or <code>$$…$$</code>, and a
+            <code>mermaid</code> code block is drawn as a diagram. A reply
+            that links to an image file in the agent's own copy of the repo
+            shows the image in place. The file panel shows an SVG file as a
+            picture and can preview an HTML page an agent has written.
           </p>
         </div>
       </div>
