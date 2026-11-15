@@ -205,7 +205,7 @@
             <picture>
               <source media="(prefers-color-scheme: dark)" srcset="assets/console-desktop-dark.png">
               <img src="assets/console-desktop-light.png" width="2880" height="1800" fetchpriority="high" decoding="async"
-                   alt="The Weather Station project open on its Build tab, with four agent windows side by side. Lead on Claude Code and Backend on Codex are working, Frontend on Claude Code is waiting for an answer, and Reviewer on Grok Build is idle after posting a review. The sidebar lists three projects; the top bar shows two items in Needs you.">
+                   alt="The weather-app project open on its Forecast page tab, with four agent windows side by side. Lead on Claude Code and Builder on Codex are working, Designer on Claude Code is waiting for an answer, and Reviewer on Grok Build is idle after posting a review. Each window's header shows its model and whether its Network is on ask or auto. The sidebar lists three projects; the top bar shows two items in Needs you.">
             </picture>
           </a>
           <figcaption>One tab with four agents on Claude Code, Codex and Grok Build. Sample data.</figcaption>
@@ -261,20 +261,20 @@
               <picture>
                 <source media="(prefers-color-scheme: dark)" srcset="assets/team-messages-dark.png">
                 <img src="assets/team-messages-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                     alt="The Team panel above the agent windows. Lead sends Frontend and Backend their parts, Backend reports a commit to Lead, Lead asks Reviewer for a review and Reviewer answers.">
+                     alt="The Team panel above the agent windows. Lead sends Designer its part, Builder reports a commit to Lead, Lead asks Reviewer for a review, Reviewer answers, and Lead passes the note on to Builder.">
               </picture>
             </a>
-            <figcaption>The Team panel on the Build tab.</figcaption>
+            <figcaption>The Team panel on the Forecast page tab.</figcaption>
           </figure>
           <figure class="shot phone">
             <a href="assets/phone-needs-you-light.png">
               <picture>
                 <source media="(prefers-color-scheme: dark)" srcset="assets/phone-needs-you-dark.png">
-                <img src="assets/phone-needs-you-light.png" width="1170" height="1460" loading="lazy" decoding="async"
-                     alt="The Needs you tray on a phone. Frontend requests network access to registry.npmjs.org, with Show, Deny, Always for this agent, Always for this project and Allow once buttons. Below it, the Docs agent asks a question, with an answer box.">
+                <img src="assets/phone-needs-you-light.png" width="1170" height="1700" loading="lazy" decoding="async"
+                     alt="The Needs you tray on a phone. Designer requests network access to registry.npmjs.org, with Show, Deny, Always for this agent, Always for this project, Allow, Network to Auto and Allow once buttons. Below it, a network request from Tester that got no answer, with Show, Dismiss, Ask again, the two Always buttons and Network to Auto.">
               </picture>
             </a>
-            <figcaption>Needs you on a phone.</figcaption>
+            <figcaption>Needs you on a phone, with one request that got no answer.</figcaption>
           </figure>
         </div>
 
@@ -314,7 +314,7 @@
               <picture>
                 <source media="(prefers-color-scheme: dark)" srcset="assets/changes-pr-dark.png">
                 <img src="assets/changes-pr-light.png" width="2880" height="1800" loading="lazy" decoding="async"
-                     alt="The Changes dialog for the Backend agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one reply's commit expanded to show its diff.">
+                     alt="The Changes dialog for the Builder agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one reply's commit expanded to show its diff.">
               </picture>
             </a>
             <figcaption>One agent's branch, its pull request and a commit for each reply.</figcaption>
@@ -446,6 +446,16 @@
             key.
           </p>
         </div>
+        <figure class="shot" style="margin-top: 40px">
+          <a href="assets/menus-light.png">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/menus-dark.png">
+              <img src="assets/menus-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                   alt="The menu of the Forecast page tab, open. Its rows are Rename, Pause tab, Spend limit with the amount spent so far, Turn limits showing 40 turns and 2 h, Network auto showing 1 of 3 with a switch, Run report, Save as template and Close tab.">
+            </picture>
+          </a>
+          <figcaption>A tab's menu, with its spend so far, its turn limits and the Network auto switch.</figcaption>
+        </figure>
       </div>
     </section>
 
@@ -513,6 +523,26 @@
             be read there before it's committed or pushed.
           </p>
         </div>
+        <figure class="shot" style="margin-top: 40px">
+          <a href="assets/html-preview-light.png">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/html-preview-dark.png">
+              <img src="assets/html-preview-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                   alt="The file panel beside the agent windows, previewing mockups/forecast.html, a weather page with today's temperature and seven day cards. Above it are the Files, Source and Run scripts buttons; below it, a note says scripts are off and nothing is loaded from the internet.">
+            </picture>
+          </a>
+          <figcaption>The file panel previewing an HTML mockup an agent wrote, with its scripts off.</figcaption>
+        </figure>
+        <figure class="shot" style="margin-top: 40px">
+          <a href="assets/rich-reply-light.png">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="assets/rich-reply-dark.png">
+              <img src="assets/rich-reply-light.png" width="2880" height="1800" loading="lazy" decoding="async"
+                   alt="One agent window at full size. Its reply explains retry waits with two formulas drawn as maths, a flowchart from the forecast page through the cache to the service, and a bar chart of the wait before each retry.">
+            </picture>
+          </a>
+          <figcaption>A reply with maths, a diagram and a picture from the agent's own copy of the repo.</figcaption>
+        </figure>
       </div>
     </section>
 
