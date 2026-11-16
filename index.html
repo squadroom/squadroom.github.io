@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Squadroom: coding agents from different vendors working as one team</title>
-  <meta name="description" content="Squadroom runs Claude Code, Codex and other coding agents as one team: they message each other in built-in or custom roles and ask you only when a decision is needed. Local web app, MIT licensed.">
+  <title>Squadroom: a self-hosted console that runs coding-agent CLIs as one team</title>
+  <meta name="description" content="Squadroom runs Claude Code, Codex, Gemini CLI and other coding-agent CLIs as one team on your Mac: a separate macOS user, one Git clone and branch per agent, a team MCP server for messages, and pushes only after your approval. MIT licensed.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#11131a" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://squadroom.github.io/">
-  <meta property="og:title" content="Squadroom: coding agents from different vendors working as one team">
-  <meta property="og:description" content="Squadroom runs Claude Code, Codex and other coding agents as one team: they message each other in built-in or custom roles and ask you only when a decision is needed. Local web app, MIT licensed.">
+  <meta property="og:title" content="Squadroom: a self-hosted console that runs coding-agent CLIs as one team">
+  <meta property="og:description" content="Squadroom runs Claude Code, Codex, Gemini CLI and other coding-agent CLIs as one team on your Mac: a separate macOS user, one Git clone and branch per agent, a team MCP server for messages, and pushes only after your approval. MIT licensed.">
   <meta property="og:url" content="https://squadroom.github.io/">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://squadroom.github.io/assets/console-desktop-light.png">
@@ -131,6 +131,7 @@
     pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; overflow-wrap: anywhere; }
     pre .c { color: #9a9eae; }
     pre .p { color: #ff9b6e; user-select: none; }
+    pre.diagram { white-space: pre; overflow-x: auto; overflow-wrap: normal; margin: 8px 0 40px; }
     .after { margin: 18px 0 0; color: var(--ink-2); font-size: 15.5px; }
 
     footer { padding: 44px 0 52px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--muted); }
@@ -165,6 +166,7 @@
         Squadroom
       </a>
       <nav class="links" aria-label="Main">
+        <a href="#hood">Under the hood</a>
         <a href="#together">Teamwork</a>
         <a href="#roles">Roles</a>
         <a href="#layout">Projects</a>
@@ -182,19 +184,21 @@
       <div class="wrap">
         <h1 id="hero-title">Squadroom</h1>
         <p class="lede">
-          Squadroom runs teams of coding agents. Claude Code, Codex, Gemini
-          CLI, Grok Build, Kimi Code and OpenCode agents can sit in the same
-          team, each with a role, and they work through the job together: they
-          message each other, hand work back and forth and review each other's
-          changes. They come back to you only when they need a decision.
+          Squadroom is a self-hosted web console that runs coding-agent CLIs
+          as a team on your Mac. Claude Code, Codex, Gemini CLI, Grok Build,
+          Kimi Code and OpenCode run as a separate, unprivileged macOS user,
+          each in its own Git clone on its own branch. They message each
+          other through an MCP server Squadroom runs, and anything that needs
+          a person, such as a network request, a push or a merge, waits in
+          one queue for you.
         </p>
         <p class="lede">
-          Work is split into projects, usually one per repo, and tabs, one per
-          piece of work such as a feature or a review. Each tab has its own
-          team and its own spend limit, and tabs run side by side. An agent
-          can propose a new tab with a team of its own, and it's created once
-          you approve it. Squadroom runs on your own machine and works from a
-          phone too. macOS today; Linux and Windows next.
+          Underneath it's two Node processes and a SQLite file. A Next.js
+          server serves the page and only reads and writes the store. A
+          worker is the only thing that starts agents: it commits every
+          turn, charges it against the tab's spend limit and pushes to GitHub
+          through its own mirror, so agents never hold a GitHub token. macOS
+          today; Linux and Windows next. MIT licensed.
         </p>
         <div class="cta">
           <a class="btn primary" href="https://github.com/squadroom/squadroom/blob/main/docs/setup.md">Setup guide</a>
@@ -213,6 +217,49 @@
       </div>
     </section>
 
+    <section id="hood" aria-labelledby="hood-title">
+      <div class="wrap">
+        <h2 id="hood-title">Under the hood</h2>
+        <div class="prose">
+          <p>
+            In the app you see projects, tabs and agent windows. This is what
+            runs underneath.
+          </p>
+        </div>
+<pre class="diagram" aria-label="Process diagram: the browser reaches the web server through an https proxy; the web server and the Console worker share a SQLite store; the worker starts agent CLIs as the agent user through a root-owned launcher."><code>browser ──https──▶ TLS proxy (e.g. Tailscale Serve) ──▶ web server (Next.js, 127.0.0.1)
+                                                            │ commands in, views out (SSE)
+                                                            ▼
+                                              ~/.squadroom/console.sqlite (WAL)
+                                                            ▲ turns, events, mailbox, spend
+                                                            │
+                                                      Console worker (Node, holds the lease)
+                                                            │ sudo -u agent (one sudoers rule)
+                                                            ▼
+                                                 launcher (root-owned) ──▶ agent CLIs
+                                                                           /Users/agent/work/&lt;project&gt;/&lt;agent&gt;</code></pre>
+        <div class="split">
+          <ul class="facts">
+            <li><strong>Web server and worker</strong>The web server validates commands, writes them to the store and streams views back over server-sent events. It never runs an agent. The worker does everything else and holds a lease in the store; every write it makes is fenced by the lease epoch, so a worker that lost its lease can't write. Either process can restart without interrupting the other.</li>
+            <li><strong>The launcher</strong>A root-owned script, <code>/usr/local/libexec/console-agent</code>, is the only thing your account may run as <code>agent</code>. It starts a program in a given folder with only the credentials it's told to pass, optionally inside a macOS sandbox profile, and can end every <code>agent</code> process. The worker refuses to start with a launcher of a different version.</li>
+            <li><strong>One driver per client</strong>Claude Code runs one process per window with Squadroom's own settings and its sandbox on. Codex runs one App Server per login or API key and one thread per window. Grok Build, Gemini CLI, Kimi Code and OpenCode speak the Agent Client Protocol (ACP), one process per window inside the launcher's sandbox. Client versions are pinned by lockfiles and installed read-only in <code>/opt/console-clients</code>.</li>
+            <li><strong>Team tools over MCP</strong>The worker runs a loopback MCP server, and each agent session gets a bearer token for it that's revoked when the session ends. Through it agents call <code>team_send</code>, <code>team_ask</code>, <code>team_pull</code>, <code>team_claim</code>, <code>team_push</code>, <code>team_merge</code> and the rest. Messages are queued in the store and delivered together as the recipient's next prompt once it's free, so no agent blocks inside a tool call.</li>
+          </ul>
+          <ul class="facts">
+            <li><strong>Permissions</strong>Every permission request a client raises goes to one function in the worker. Writes inside the agent's own clone are allowed, except at Code analysis; reads outside it are refused, with <code>..</code> paths and symbolic links that lead out counting as outside. Network access per host, unknown tools and pushes go to Needs you. "Always" rules are Squadroom's own, never the client's.</li>
+            <li><strong>Commits from disk</strong>At the end of each turn the worker commits what's on disk in the clone, with hooks off. Because the agent owns its <code>.git</code>, every Git command the worker runs there ignores replace refs, grafts and the commit graph, so an agent can't make a commit look like it holds a different tree.</li>
+            <li><strong>GitHub through a mirror</strong>Each project has a bare mirror in <code>~/.squadroom</code>, the only place the GitHub token is used. Clones are made from Git bundles of the mirror, and pushes go back the same way. Squadroom pushes only <code>console/</code> branches, only to repos whose base branch is protected by a ruleset, and only after reading every new object and refusing the push if it holds a key Squadroom handed out. <code>team_merge</code> squash-merges with the head commit you approved pinned, so GitHub refuses if it moved.</li>
+            <li><strong>Charging a turn</strong>A turn costs the usage its client reported times the model's catalog prices, cache included. Claude Code reports a running total, so the worker stores it in the same transaction as the charge and bills the difference. A turn whose usage is missing or doesn't add up is charged the model's full allowance per request and pauses its tab.</li>
+          </ul>
+        </div>
+        <p class="after">
+          The full picture, including the store's schema, sign-in and the
+          threat model, is in
+          <a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">architecture.md</a>
+          and
+          <a href="https://github.com/squadroom/squadroom/blob/main/docs/threat-model.md">threat-model.md</a>.
+        </p>
+      </div>
+    </section>
     <section id="together" class="band" aria-labelledby="together-title">
       <div class="wrap">
         <h2 id="together-title">How the agents work together</h2>
