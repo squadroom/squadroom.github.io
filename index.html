@@ -72,6 +72,8 @@
     .prose { max-width: 40em; }
     .prose p { margin: 0 0 16px; color: var(--ink-2); }
     .prose strong { color: var(--ink); }
+    .prose ul { margin: 0 0 16px; padding-left: 20px; }
+    .prose li { color: var(--ink-2); margin-bottom: 8px; }
 
     /* Header */
     header.top { padding: 20px 0; }
@@ -172,7 +174,7 @@
         <a href="#layout">Projects</a>
         <a href="#agents">Agents</a>
         <a href="#spend">Spend</a>
-        <a href="#safety">Safety</a>
+        <a href="#safety">Security</a>
         <a href="#start">Setup</a>
         <a class="gh" href="https://github.com/squadroom/squadroom">GitHub</a>
       </nav>
@@ -262,43 +264,72 @@
     </section>
     <section id="together" class="band" aria-labelledby="together-title">
       <div class="wrap">
-        <h2 id="together-title">How the agents work together</h2>
+        <h2 id="together-title">Mailbox, routes and Needs you</h2>
         <div class="split">
           <div class="prose">
             <p>
-              Agents talk to each other directly. One can send another a
-              message, ask it a question and wait for the answer, pull in its
-              changes, or claim the files it's about to edit so nobody else
-              touches them. A message waits until the other agent has finished
-              its current reply, then arrives as its next prompt.
+              The agents in a tab share one mailbox, a table in the store. The
+              team tools are MCP tools the worker serves on loopback.
+              <code>team_send</code> queues a message (up to 32,000
+              characters), <code>team_ask</code> queues a question that the
+              other agent answers with <code>team_reply</code>, and
+              <code>team_read</code> pages through the mailbox. No tool call
+              waits for another agent. When the recipient's turn ends,
+              everything queued for it is delivered together as one prompt,
+              and that prompt is its next turn.
             </p>
             <p>
-              Some hand-offs need no message at all. A route says, for
-              example, that whenever the Lead ends a reply with "ready for
-              review", that reply goes straight to the Reviewer.
+              <code>team_pull</code> merges a teammate's latest committed
+              work into the caller's branch, or the base branch as GitHub has
+              it now. A clean merge is committed at once; with conflicts the
+              agent resolves the markers and the merge is committed when its
+              turn ends. <code>team_claim</code> marks paths or globs as
+              being edited, and Claude Code teammates' writes there are
+              refused until the claim is released or expires after two hours.
+              <code>team_hold</code> stops mail reaching a teammate for up to
+              30 minutes.
+            </p>
+            <p>
+              A route forwards a reply with no tool call. It names a sender, a
+              recipient and an optional phrase of up to 100 characters. When
+              the sender's final message contains the phrase (any case), or
+              on every reply if there's no phrase, the first 8,000 characters
+              are queued to the recipient. The recipient reads the rest with
+              <code>team_read</code>.
             </p>
           </div>
           <div class="prose">
             <p>
-              A job starts with one message. In a team it goes to the
-              Orchestrator, which splits the job up and hands out the parts. In
-              a pair it goes to the Pair Lead, which has the Reviewer check its
-              work before reporting back. Any agent's window still takes a
-              message at any time.
+              Your message goes to whichever window you type it in. In a team
+              you normally send it to the Orchestrator, in a pair to the
+              Pair Lead. While a Claude Code or Codex turn is running, your
+              first queued message can be handed to that turn instead of
+              waiting for the next one: Codex gets <code>turn/steer</code>,
+              and Claude Code gets a user line whose fate it reports in
+              <code>command_lifecycle</code> lines. ACP agents can't take a
+              message mid-turn.
             </p>
             <p>
-              Anything that needs a human decision, such as a question, a
-              request to reach a website, a branch ready to push or a
-              proposal for a new tab, lands in
-              one list called <strong>Needs you</strong>, across every project.
-              The <strong>Team</strong> panel shows every message the agents
-              have sent each other.
+              Two limits stop agents keeping each other busy. Everything one
+              of your messages sets off, through all the mail and routes that
+              follow, is capped at 40 turns and two hours by default (each
+              tab can set its own). The circle detector pauses a tab after 12
+              messages between two agents with no new commit, owner message
+              or Resume in between. The worker reads the limits again just
+              before a queued turn starts, so lowering one stops work already
+              queued.
             </p>
             <p>
-              A permission request closes when the agent's reply ends, for
-              example at a time limit while you were away. It stays in Needs
-              you, marked "got no answer". You can allow it for next time,
-              have the agent ask again, or dismiss it.
+              Whatever the worker can't decide on its own goes into
+              <strong>Needs you</strong>, one list across every project:
+              network requests per host, unknown tools, pushes, pull request
+              and merge approvals, tab proposals and failed pushes. A
+              permission request whose turn ended before you answered stays
+              there, marked "got no answer". You can allow it for next time
+              (Always for the agent or project, or Network to Auto), send it
+              back to be asked again, or dismiss it. Nothing is allowed once
+              after the fact. The <strong>Team</strong> panel shows every
+              message in the tab's mailbox.
             </p>
           </div>
         </div>
@@ -311,7 +342,7 @@
                      alt="The Team panel above the agent windows. Lead sends Designer its part, Builder reports a commit to Lead, Lead asks Reviewer for a review, Reviewer answers, and Lead passes the note on to Builder.">
               </picture>
             </a>
-            <figcaption>The Team panel on the Forecast page tab.</figcaption>
+            <figcaption>The Team panel: the tab's mailbox.</figcaption>
           </figure>
           <figure class="shot phone">
             <a href="assets/phone-needs-you-light.png">
@@ -324,36 +355,53 @@
             <figcaption>Needs you on a phone, with one request that got no answer.</figcaption>
           </figure>
         </div>
-
         <div class="pair flip">
           <div class="prose">
-            <h3>Branches and pull requests</h3>
+            <h3>Clones, commits and GitHub</h3>
             <p>
-              Every agent works in its own copy of the repo, on its own branch.
-              Each time an agent finishes a reply, Squadroom commits whatever it
-              changed, so the history reads one reply at a time. In a GitHub
-              project the commits carry your GitHub no-reply address, so
-              GitHub and anything that deploys from it treat them as yours.
+              Each agent works in <code>/Users/agent/work/&lt;project&gt;/&lt;agent&gt;</code>,
+              a clone on its own <code>console/&lt;id&gt;-&lt;name&gt;</code>
+              branch. A Code analysis agent's clone stays on the base branch.
+              At the end of every turn the worker commits what's on disk, as
+              <code>agent</code> with hooks off. The commit message is your
+              request for that turn, redacted. In a GitHub project the author
+              is the agent's name with the no-reply address of the account the
+              token belongs to, read once from <code>GET /user</code>. The same
+              identity goes into the clone's Git config, so a
+              <code>git commit</code> the agent runs itself carries it too.
             </p>
             <p>
-              An agent's copy is made once and doesn't update from GitHub by
-              itself. When the base branch gets new commits there, the
-              agent's window says so, for example "main has new commits",
-              and the agent is told with its next message. It then merges
-              them into its branch itself.
+              A clone is made from a bundle of the project's bare mirror and
+              never fetches by itself. Every ten minutes the worker runs one
+              <code>ls-remote</code> for each project with an open editing
+              agent. If the base branch has moved, the agent's window shows a
+              chip and its next prompt starts with one line saying so. The
+              agent then brings the base in with
+              <code>team_pull(from: "main")</code>: the worker fetches into the
+              mirror and passes the branch to the clone in a bundle.
             </p>
             <p>
-              Nothing goes to GitHub until it's approved, either once or for
-              good for that agent. Squadroom then pushes the branch and opens
-              the pull request.
+              <code>team_push</code> files an approval in Needs you that shows
+              the pull request's title and description exactly as they'll be
+              posted. You approve once or always for that agent. The worker
+              pushes only the commit it recorded at the end of the agent's
+              last turn, after the checks in
+              <a href="#hood">Under the hood</a>, then opens or updates the
+              pull request with the same token. A failed push is recorded in
+              one transaction, and the agent's next prompt starts with the
+              reason and whether you or it has to act.
             </p>
             <p>
-              An agent can read the GitHub Actions results for its pull
-              request, and the end of a failing job's log. Tests that can't
-              run inside the sandbox, such as Firefox and WebKit browser
-              tests, can run on GitHub instead, and the agent works from the
-              result. The GitHub token needs <strong>Actions:
-              Read-only</strong> for this.
+              <code>team_checks</code> reads the GitHub Actions jobs for the
+              latest commit on the agent's own pull request, and the end of a
+              job's log (the last 24,000 characters, redacted). So tests that
+              can't run in the sandbox, such as Firefox and WebKit browser
+              tests, can run on GitHub, and the agent works from the result.
+              The token needs <strong>Actions: Read-only</strong>.
+              <code>team_merge</code> asks for a squash merge. The worker
+              checks the pull request is open, conflict-free, fully pushed and
+              green, files it in Needs you, and on approval merges with
+              <code>sha</code> pinned to the commit you saw.
             </p>
           </div>
           <figure class="shot">
@@ -364,33 +412,33 @@
                      alt="The Changes dialog for the Builder agent: its branch, a note that it was pushed and pull request 42 was opened, an Approve button, the files changed against main, and one reply's commit expanded to show its diff.">
               </picture>
             </a>
-            <figcaption>One agent's branch, its pull request and a commit for each reply.</figcaption>
+            <figcaption>One agent's branch, its pull request and one commit per turn.</figcaption>
           </figure>
         </div>
       </div>
     </section>
-
     <section id="roles" aria-labelledby="roles-title">
       <div class="wrap split wide-right">
         <div class="prose">
           <h2 id="roles-title">Roles</h2>
           <p>
-            A role is a named prompt that sets an agent's job and how it works
-            with the rest of the squad. Eight are built in.
+            A role is a system prompt plus an access level. The prompt sets
+            the agent's job and how it uses the team tools. The access level
+            is enforced by the worker, not by the prompt.
           </p>
           <p>
-            Every role has one of two access levels. <strong>Code edit</strong>
-            changes files in the agent's own copy of the repo.
-            <strong>Code analysis</strong> reads code, runs commands and
-            messages the others, with no file changes.
+            <strong>Code edit</strong> agents get a branch, and the worker
+            allows their writes inside their own clone.
+            <strong>Code analysis</strong> agents sit on the base branch, and
+            every write request they make is refused. They can still read,
+            run commands you approve and use the team tools.
           </p>
           <p>
-            A custom role has a name, a one-line description, an access level,
-            a suggested agent (Claude Code or Codex) and a prompt of up to
-            3,500 characters. Choosing a role fills in its access, suggested
-            agent and prompt; vendor and model are picked for each agent. Built-in prompts can be
-            rewritten and reset, and any single agent's prompt can be
-            overridden without changing its role.
+            A custom role has a name, a one-line description, an access
+            level, a suggested client (Claude Code or Codex) and a prompt of
+            up to 3,500 characters. Client and model are still chosen per
+            agent. Built-in prompts can be rewritten and reset, and one
+            agent's prompt can be overridden without touching its role.
           </p>
         </div>
         <ul class="roles" aria-label="Built-in roles">
@@ -405,93 +453,150 @@
         </ul>
       </div>
     </section>
-
     <section id="layout" class="band" aria-labelledby="layout-title">
       <div class="wrap">
-        <h2 id="layout-title">Projects, tabs and squads</h2>
-        <div class="prose">
-          <p>
-            A project is a GitHub repo, a new local folder, or no files at all
-            for agents that only discuss. Its tabs run concurrently; one might
-            hold a feature, another a security review, another the docs.
-          </p>
-          <p>
-            A squad can be one agent, a pair, or an Orchestrator with up to
-            seven others. Each agent has its own name, model, access level
-            and, where the model has one, thinking level. The model and
-            thinking level can be changed later: the model name in the
-            agent window's header opens a list of both. A choice is saved at
-            once and applies from the agent's next reply.
-          </p>
-          <p>
-            An agent can propose a new tab with its own squad. It gives the
-            tab a name, a goal and the members it wants, and the proposal
-            appears in Needs you. There you create it as proposed, edit the
-            team first, or decline. Nothing is created without your approval,
-            and there's no cap on how many tabs an agent can propose.
-          </p>
-          <p>
-            The agent that proposed the tab is told what you decided. It and
-            the new tab's lead can message each other across the two tabs, and
-            when the new tab's work is done its result goes back to the agent
-            that proposed it.
-          </p>
+        <h2 id="layout-title">Projects, tabs and scheduling</h2>
+        <div class="split">
+          <div class="prose">
+            <p>
+              A project is a GitHub repo, a new local folder, or no files at
+              all for agents that only discuss. For a GitHub repo the worker
+              first checks that the base branch exists and is protected by a
+              ruleset that names it, then builds the mirror that every clone
+              comes from.
+            </p>
+            <p>
+              A tab is the unit of work. Each has its own agents, mailbox,
+              routes, spend and turn limits, and tabs run side by side. A
+              team is one agent, a pair, or an Orchestrator with up to seven
+              others. Each agent has its own client, model, access level and,
+              where the model has one, thinking level. Changing the model or
+              thinking level keeps the conversation and applies from the next
+              turn.
+            </p>
+            <p>
+              Turns are scheduled across all of Squadroom: at most six run at
+              once, and at most three per login (one subscription account, or
+              one API key however many projects use it). The rest wait in a
+              queue. At most eight agent processes stay alive, and idle ones
+              close first. A turn stops after 30 minutes, after ten minutes
+              with no output, or at 4 MB of stored output.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              An agent can propose a new tab with <code>team_propose_tab</code>.
+              That creates nothing. The proposed team is checked as the setup
+              screen would check it, then stored with a Needs you item, where
+              you create it, edit the team first, or decline.
+            </p>
+            <p>
+              A tab created this way records the agent that proposed it and
+              its own lead. Those two are linked across tabs:
+              <code>team_send</code>, <code>team_ask</code> and
+              <code>team_reply</code> work between them, checked again as each
+              message is stored, so the link ends when either agent or tab is
+              closed. When the new tab comes to rest (no running or queued
+              turn, no mail waiting, not paused), the worker sends its lead's
+              final message to the proposer once. If the proposer has been
+              closed by then, it goes to Needs you.
+            </p>
+          </div>
         </div>
       </div>
     </section>
-
     <section id="agents" aria-labelledby="agents-title">
       <div class="wrap split">
         <div class="prose">
           <h2 id="agents-title">Agents</h2>
           <p>
-            Each agent runs on your own subscription or API key, at Code edit
-            or Code analysis.
+            Each client is driven over its own protocol, and each runs on
+            your own subscription or API key. Versions are pinned by
+            committed lockfiles, installed with <code>npm ci</code> as
+            <code>agent</code> and copied read-only into
+            <code>/opt/console-clients</code>.
           </p>
           <p>
-            Claude Code agents with Code edit can generate images with Krea,
-            turned on per project. An image costs $0.015 to $0.065, charged to
-            the tab; one reply can make at most 8 images and spend at most $1.
-            Images are saved to <code>design/</code> and committed with the reply.
+            Only what ran counts. Changes come from the folder on disk, and
+            commands are shown from the client's own events, never from the
+            agent's account of them. If a client reports a different model
+            than the one selected, or an API-key login where a subscription
+            was selected (or the other way round), its turn is thrown away.
+          </p>
+          <p>
+            Claude Code agents with Code edit can make images with Krea,
+            switched on per project. An image costs $0.015 to $0.065, charged
+            to the tab. One turn can make at most 8 images and spend at most
+            $1. Images go in <code>design/</code> and are committed with the
+            turn.
           </p>
         </div>
         <ul class="reqs" aria-label="Agents">
-          <li><b>Claude Code</b><span>Claude plan, or an Anthropic API key through its "(API key)" models.</span></li>
-          <li><b>Codex</b><span>ChatGPT login, or an OpenAI API key through its "(API key)" models.</span></li>
-          <li><b>Grok Build</b><span>xAI API key.</span></li>
-          <li><b>Gemini CLI</b><span>Gemini API key.</span></li>
-          <li><b>Kimi Code</b><span>Kimi Code membership.</span></li>
-          <li><b>OpenCode</b><span>An API key for its model: GPT-5.6 Luna, Claude Haiku 4.5, DeepSeek V4 Pro or V4.1 Flash, Kimi K3, GLM-5.3 or GLM-5.3-Flash, or Qwen 3.8 Max via OpenRouter. Needs the project's network on.</span></li>
+          <li><b>Claude Code</b><span>One process per window, started with <code>--setting-sources ""</code> and Squadroom's own settings: its sandbox on, reads outside the clone blocked. Claude plan, or an Anthropic API key.</span></li>
+          <li><b>Codex</b><span>One App Server per ChatGPT login or OpenAI API key, one thread per window, with a permission profile that denies every other agent's folder. Writes its sandbox wouldn't allow are declined.</span></li>
+          <li><b>Grok Build</b><span>ACP, in the launcher's sandbox profile. xAI API key.</span></li>
+          <li><b>Gemini CLI</b><span>ACP, in the launcher's sandbox profile, usage statistics off. Gemini API key.</span></li>
+          <li><b>Kimi Code</b><span>ACP, in the launcher's sandbox profile. Data kept in the window's own temporary folder, only the login shared. Kimi Code membership.</span></li>
+          <li><b>OpenCode</b><span>ACP, in the launcher's sandbox profile. Ignores the repo's own <code>opencode.json</code> and <code>.opencode/</code>. An API key for GPT-5.6 Luna, Claude Haiku 4.5, DeepSeek V4 Pro or V4.1 Flash, Kimi K3, GLM-5.3 or GLM-5.3-Flash, or Qwen 3.8 Max via OpenRouter. Needs the project's network on.</span></li>
         </ul>
       </div>
     </section>
-
     <section id="spend" class="band" aria-labelledby="spend-title">
       <div class="wrap">
-        <h2 id="spend-title">Spend limits</h2>
-        <div class="prose">
-          <p>
-            Agents on a subscription (Claude plan, ChatGPT login, Kimi Code
-            membership) cost nothing extra. Metered API keys have two limits.
-          </p>
-          <p>
-            <strong>Per tab.</strong> Each tab has a spend limit, $5 by
-            default. A tab that reaches it pauses until <strong>Reset
-            spend</strong>, which needs an e-mailed code. Cost comes from each
-            reply's reported usage; a reply whose usage can't be read is charged
-            the most it could have cost and pauses the tab.
-          </p>
-          <p>
-            <strong>Per key, at the provider.</strong> Every paid key needs a
-            monthly cap set at the provider and entered with the key; no key is
-            handed to an agent until then. The provider's cap is the hard
-            ceiling, since Squadroom's own figures are estimates.
-          </p>
-          <p>
-            Up to six agents work at once, three per account or key; the rest
-            wait their turn. The Overview page shows this month's spend per tab and per
-            key.
-          </p>
+        <h2 id="spend-title">Spend</h2>
+        <div class="split">
+          <div class="prose">
+            <p>
+              Only API-key models and image calls are counted. Subscription
+              logins (Claude plan, ChatGPT login, Kimi Code membership) aren't.
+              Squadroom sets no spend limit by default. There are three you can
+              set:
+            </p>
+            <p>
+              <strong>Per tab</strong>, $0.01 to $1,000. The tab pauses when
+              it reaches the limit, until you reset its spend or raise the
+              limit and resume.
+            </p>
+            <p>
+              <strong>Across Squadroom</strong>, $0.01 to $10,000 per UTC
+              month. When it's reached, every tab with an API-key agent
+              pauses and image calls are refused. New tabs don't get round
+              it.
+            </p>
+            <p>
+              <strong>Per key, at the provider.</strong> This is the one
+              Squadroom requires. You set a monthly cap on the provider's site
+              and enter it with the key, and no agent gets the key until you
+              do. It's the real ceiling, because Squadroom's own figures are
+              estimates.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              A turn is charged the usage its client reported times the
+              model's catalog prices, cache included. Claude Code reports a
+              running total for its session, so the worker keeps the last
+              total in the same transaction as the charge and bills the
+              difference. A restarted worker resuming the session charges only
+              what came after. Long-context rates apply per request where the
+              client reports per request (Codex), and to the whole turn where
+              it reports only a total (ACP).
+            </p>
+            <p>
+              Squadroom charges too much rather than too little. A turn whose
+              usage is missing or doesn't add up, or that didn't end normally,
+              is charged the model's full allowance for every request its
+              usage doesn't cover: the whole context window as input, plus
+              maximum output. Its tab pauses. While a turn runs, its prices
+              and the paying key's fingerprint are kept on its row, so a
+              restart charges it the same way.
+            </p>
+            <p>
+              Raising or removing a limit, or resetting spend, needs a fresh
+              e-mailed code. Lowering or setting one doesn't. The Overview
+              shows this month's spend per tab and per key.
+            </p>
+          </div>
         </div>
         <figure class="shot" style="margin-top: 40px">
           <a href="assets/menus-light.png">
@@ -505,79 +610,105 @@
         </figure>
       </div>
     </section>
-
     <section id="safety" aria-labelledby="safety-title">
       <div class="wrap split">
         <div class="prose">
-          <h2 id="safety-title">Safety</h2>
+          <h2 id="safety-title">Security</h2>
           <p>
-            Coding agents run commands and can be steered by anything they
-            read.
+            Squadroom treats every agent as possibly wrong, misled by
+            something it read, or hostile. It also defends against anyone who
+            can reach the web page and against repositories whose files try
+            to change how an agent or the worker behaves. You, your macOS
+            account, root and the model providers are trusted.
           </p>
+          <p>Known limits, which are design decisions rather than open bugs:</p>
+          <ul>
+            <li>All agents share the <code>agent</code> user, so a running agent can read another running agent's process environment, keys included. Treat every handed-out key as readable by all agents.</li>
+            <li>The Claude Code and Codex programs themselves run as <code>agent</code> outside their own sandboxes (the commands they run are sandboxed) and share your launchd session.</li>
+            <li>An agent on Network Auto can send anything it can read to any site.</li>
+            <li>An HTML preview with Run scripts on can leak small amounts of the page's own content through host-name look-ups.</li>
+            <li>Claude Code's file tools aren't confined by the kernel. A symbolic link swapped in after the worker's path check can redirect a write to another place <code>agent</code> can write.</li>
+            <li>Only handed-out keys and common key formats are redacted.</li>
+          </ul>
           <p>
-            Known limits: all agents run as the same OS user, so a running agent
-            can read another running agent's environment, keys included. Treat
-            every key as readable by all agents and cap paid keys at the
-            provider. Approved network access is real access. Squadroom is
-            meant for one person on their own machine.
-            <a href="https://github.com/squadroom/squadroom/blob/main/docs/architecture.md">Architecture</a>
-            has the details.
+            Squadroom is for one person on their own machine; it isn't a
+            multi-tenant sandbox. The full list is in the
+            <a href="https://github.com/squadroom/squadroom/blob/main/docs/threat-model.md">threat model</a>.
           </p>
         </div>
         <ul class="facts">
-          <li><strong>Separate OS user</strong>Agents run as a hidden <code>agent</code> user that can't read your home folder.</li>
-          <li><strong>One copy per agent</strong>Each agent writes only inside its own copy of the repo. Claude Code and Codex run in their own sandboxes; Grok Build, Gemini CLI, Kimi Code and OpenCode run inside the launcher's macOS sandbox profile.</li>
-          <li><strong>Network by approval</strong>Claude Code and Codex ask per site, and an approval can be once, always for that agent, or always for the project. Each of their windows shows <strong>Network ask</strong> or <strong>Network auto</strong> in its header, and a click switches it. On Auto the agent reaches any website without asking, so it could send anything it can read to any site. Grok Build, Gemini CLI, Kimi Code and OpenCode have no network unless it is turned on for the project.</li>
-          <li><strong>No GitHub token for agents</strong>Squadroom pushes for them, only to <code>console/</code> branches, only in repos whose base branch is protected by a GitHub ruleset (no force push, deletion or direct push), and only after checking the push holds none of the keys it handed out.</li>
-          <li><strong>Automatic pauses</strong>A tab pauses itself after 40 agent replies or 2 hours from one message. Those two limits are the defaults, and each tab can have its own under Turn limits in the tab's menu. A tab also pauses after 12 messages between two agents with no new commit. Resume continues it. A tab, a project or everything can be paused by hand at any time.</li>
-          <li><strong>Redaction</strong>Handed-out keys and common key formats are redacted from stored output. Other secrets an agent prints are stored as printed.</li>
-          <li><strong>What agents write stays on the page</strong>Replies are shown without raw HTML, and an image appears only if it is a file in the agent's own copy of the repo; a web address is shown as text, so a reply can't make your browser fetch anything. An HTML page an agent wrote is shown only when you click Preview, in a sandboxed frame that can't read Squadroom, with its scripts off. <strong>Run scripts</strong> is a separate button: a running script still can't read Squadroom or use HTTP, but it can pass small amounts of the page's own content out through host-name look-ups.</li>
-          <li><strong>Sign-in</strong>Only your GitHub account, plus an e-mailed code when e-mail is configured. Changing keys, raising a limit, resetting spend, turning on network or image tools, or adding an "always" rule needs a code entered in the last 8 hours; without e-mail these actions are refused.</li>
+          <li><strong>Separate OS user</strong>Agents run as <code>agent</code>: no login, its own group, not in <code>staff</code>, no read access to your home folder. The only way in is one <code>sudoers</code> rule for the root-owned launcher.</li>
+          <li><strong>Filesystem</strong>Writes are allowed only inside the agent's own clone, and only the current step's files in a tab with steps. Paths with <code>..</code> and symbolic links that lead out count as outside. Every other project's folder and every teammate's clone is listed as denied for each client. No agent can read <code>~/.claude.json</code>.</li>
+          <li><strong>Network</strong>Claude Code and Codex ask per host, and an approval can be once, always for the agent, or always for the project. Network Auto, switched per agent or per tab with a fresh e-mailed code, allows their command network access, WebFetch and WebSearch, and logs each one in the window. ACP agents have no network except the worker's loopback port unless the project allows it.</li>
+          <li><strong>No GitHub token for agents</strong>The token lives only in the worker's mirrors. Pushes go only to <code>console/</code> branches, only in repos whose base branch has a ruleset, after an exact-byte scan of every new object for handed-out keys. A credential re-encoded (base64, UTF-16, split lines) isn't caught.</li>
+          <li><strong>Untrusted <code>.git</code></strong>The worker's own Git commands in a clone run with <code>--no-replace-objects</code>, <code>core.commitGraph=false</code>, no grafts and no automatic maintenance, and clear skip-worktree and assume-unchanged flags before checking changes. Diffs use <code>--text</code>, so attributes can't hide a change as binary.</li>
+          <li><strong>The page</strong>Agent Markdown is rendered without raw HTML. Images show only if they're files in the agent's own clone, sent as <code>data:</code> URLs. The Content-Security-Policy limits scripts, styles, images and requests to the page's own address and sets <code>frame-src 'none'</code>. Requests from loopback get no special trust.</li>
+          <li><strong>Sign-in</strong>Your own GitHub OAuth app with PKCE, and only one numeric account ID gets in. Then an 8-digit e-mailed code, stored hashed, valid 10 minutes and used once, with a 15-minute lock after five wrong codes. Sessions are random IDs, stored hashed, in a <code>__Host-</code> cookie. Commands need the page's <code>Origin</code>, a same-origin fetch and a custom header. Weighty commands need a code entered in the last 8 hours.</li>
+          <li><strong>Redaction</strong>Every key in the key file, and every key it held before, is redacted from events before they're stored, and replaced keys stay masked after a restart.</li>
         </ul>
       </div>
     </section>
-
     <section id="templates" class="band" aria-labelledby="templates-title">
       <div class="wrap">
-        <h2 id="templates-title">Templates and documents</h2>
-        <div class="prose">
-          <p>
-            A tab can be saved as a template with its agents, roles and
-            routes, and a new tab can start from one.
-          </p>
-          <p>
-            The built-in <strong>Document review</strong> template takes a
-            project from brief to product backlog before any code is written.
-            A Lead on Claude Code writes each step's document in Markdown and
-            a Reviewer on Codex reviews it, the two passing drafts and findings
-            back and forth by routes. The steps are Brief, Design Principles,
-            an optional Detailed Design, Architecture with ADRs, Delivery Plan
-            and Product Backlog. Each step can change only its own files, its
-            document must be approved before the next step starts, and
-            decisions left for later go in <code>parking-lot.md</code>.
-          </p>
-          <p>
-            Any document workflow works the same way. A template can define
-            its own steps, each with a name and the files it may change, and
-            Document review can be copied and edited as a starting point. A
-            step template keeps whatever team the tab has, from a pair to an
-            Orchestrator with several writers and reviewers, and any agent can
-            do the writing.
-          </p>
-          <p>
-            <strong>Files</strong> in each agent's menu lists the files in
-            that agent's copy of the repo, Markdown first, and opens them
-            formatted in the file panel. A document an agent has written can
-            be read there before it's committed or pushed.
-          </p>
-          <p>
-            Replies and Markdown files show maths written as
-            <code>$…$</code> or <code>$$…$$</code>, and a
-            <code>mermaid</code> code block is drawn as a diagram. A reply
-            that links to an image file in the agent's own copy of the repo
-            shows the image in place. The file panel shows an SVG file as a
-            picture and can preview an HTML page an agent has written.
-          </p>
+        <h2 id="templates-title">Templates, steps and rendering</h2>
+        <div class="split">
+          <div class="prose">
+            <p>
+              A tab can be saved as a template with its agents, roles and
+              routes, and new tabs can start from one.
+            </p>
+            <p>
+              A template can also define steps, each with a name and the
+              files it may change, and the worker enforces them. During a
+              step, permission requests to write anything else are refused.
+              Before each commit the worker puts back anything the turn
+              changed outside the step's files, however it was written. A
+              step commit is checked again against where the step began, and
+              a tab with steps never commits a merge (a commit with a second
+              parent is undone). The next step starts only after you approve
+              the current step's document.
+            </p>
+            <p>
+              The built-in <strong>Document review</strong> template uses this
+              to take a project from brief to backlog before any code is
+              written. A Lead on Claude Code writes and a Reviewer on Codex
+              reviews, passing drafts and findings by routes. The steps are
+              Brief, Design Principles, an optional Detailed Design,
+              Architecture with ADRs, Delivery Plan and Product Backlog.
+              Deferred decisions go in <code>parking-lot.md</code>. It can be
+              copied and edited, and a step template works with any team
+              shape.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              <strong>Files</strong> in an agent's menu lists the files in its
+              clone, Markdown first, and opens them in the file panel before
+              anything is committed or pushed.
+            </p>
+            <p>
+              Replies and Markdown files render maths with KaTeX
+              (<code>trust</code> off) and <code>mermaid</code> blocks with
+              Mermaid in strict mode. Dollar amounts such as "$5 and $10" are
+              escaped before parsing so they stay text. A streaming reply is
+              cut at blank lines outside code fences: finished pieces render
+              once and only the growing piece re-renders. On a 53 KB reply
+              that cut render work from about 9.5 s to 0.65 s.
+            </p>
+            <p>
+              An SVG opens as an <code>&lt;img&gt;</code>, so nothing in it runs.
+              An HTML file opens as source. <strong>Preview</strong> inlines
+              the files it names from the same clone (at most 60 files and
+              8 MB), strips prefetch links, <code>&lt;base&gt;</code>,
+              <code>&lt;meta http-equiv&gt;</code>, frames, form actions and
+              scripts, parses the result again in the browser to catch what a
+              text scan missed, and shows it in a <code>srcdoc</code> frame
+              with an empty <code>sandbox</code> and
+              <code>script-src 'none'</code>. <strong>Run scripts</strong>
+              reloads it with <code>allow-scripts</code>, and switches off
+              again for every file you open.
+            </p>
+          </div>
         </div>
         <figure class="shot" style="margin-top: 40px">
           <a href="assets/html-preview-light.png">
@@ -587,7 +718,7 @@
                    alt="The file panel beside the agent windows, previewing mockups/forecast.html, a weather page with today's temperature and seven day cards. Above it are the Files, Source and Run scripts buttons; below it, a note says scripts are off and nothing is loaded from the internet.">
             </picture>
           </a>
-          <figcaption>The file panel previewing an HTML mockup an agent wrote, with its scripts off.</figcaption>
+          <figcaption>The file panel previewing an HTML mockup with scripts off.</figcaption>
         </figure>
         <figure class="shot" style="margin-top: 40px">
           <a href="assets/rich-reply-light.png">
@@ -597,11 +728,10 @@
                    alt="One agent window at full size. Its reply explains retry waits with two formulas drawn as maths, a flowchart from the forecast page through the cache to the service, and a bar chart of the wait before each retry.">
             </picture>
           </a>
-          <figcaption>A reply with maths, a diagram and a picture from the agent's own copy of the repo.</figcaption>
+          <figcaption>A reply with KaTeX maths, a Mermaid diagram and an image from the agent's clone.</figcaption>
         </figure>
       </div>
     </section>
-
     <section id="start" aria-labelledby="start-title">
       <div class="wrap">
         <h2 id="start-title">Setup</h2>
@@ -611,7 +741,7 @@
             <ul class="reqs" aria-label="Requirements">
               <li><b>Platform</b><span>macOS today; Linux and Windows next. About 10 GB of free disk.</span></li>
               <li><b>Tools</b><span>Node.js 24 and Git.</span></li>
-              <li><b>sudo, once</b><span>For the setup script, which creates the <code>agent</code> user and installs the agent CLIs and a small launcher.</span></li>
+              <li><b>sudo, once</b><span>For the setup script. It creates the <code>agent</code> user, installs the pinned agent clients read-only in <code>/opt/console-clients</code>, installs the root-owned launcher and adds the one <code>sudoers</code> rule that lets your account run it as <code>agent</code>.</span></li>
               <li><b>https address</b><span>Needed for sign-in and for phone access. Tailscale Serve works.</span></li>
               <li><b>GitHub token</b><span>For GitHub projects, a fine-grained token with Contents and Pull requests set to read and write. Add Actions: Read-only if agents should read check results.</span></li>
               <li><b>Accounts</b><span>A GitHub OAuth app for sign-in, a Resend account for e-mailed codes (adding keys needs one), and accounts or keys for the agents in use.</span></li>
